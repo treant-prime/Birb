@@ -1,6 +1,7 @@
 <script>
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
+const API_KEY = "";
 const YT_CHANNEL_ID = "UCuQZ-VMez8stUmNvNDfpV7A";
 const TEST_API_PLAYLIST_ID = "UC_x5XG1OV2P6uZZ5FSM9Ttw";
 
