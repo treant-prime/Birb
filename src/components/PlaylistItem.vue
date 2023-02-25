@@ -4,13 +4,13 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 const API_KEY = "";
 const YT_CHANNEL_ID = "UCuQZ-VMez8stUmNvNDfpV7A";
 const TEST_API_PLAYLIST_ID = "UC_x5XG1OV2P6uZZ5FSM9Ttw";
-const ITEMS_PER_APGE = 50;
 
 export default {
   name: "LoginView",
   data() {
     return {
       playlists: [],
+      counter: 0,
     };
   },
   methods: {
@@ -38,27 +38,28 @@ export default {
         });
     },
     fetchPlaylistsPage(token, forceRun, nextPageToken) {
-      const url = this.constructFetchPlaylistUrl(nextPageToken)
+      // const part = "contentDetails,id,localizations,player,snippet,status";
+      const part = "id,snippet,status";
+      const itemsPerPage = 50;
+      let url;
+      if (nextPageToken) {
+        url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${itemsPerPage}&pageToken=${nextPageToken}`;
+      } else {
+        url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${itemsPerPage}`;
+      }
 
       fetch(url, {
         headers: this.headers(token),
       })
         .then((response) => response.json())
         .then((data) => {
+          console.log(data);
           let mappedItems = data.items.map((item) => item.snippet.title);
           this.playlists = [...this.playlists, ...mappedItems];
 
           if (data.nextPageToken || forceRun)
             this.fetchPlaylistsPage(token, false, data.nextPageToken);
         });
-    },
-    constructFetchPlaylistUrl(nextPageToken) {
-      // url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${ITEMS_PER_APGE}&pageToken=${nextPageToken}`;
-      // Important: Po autoryzacji API_KEY nie jest juz potrzebny
-      const part = "id,snippet,status";
-      let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=${ITEMS_PER_APGE}`;
-      if(nextPageToken) url = url + `&pageToken=${nextPageToken}`;
-      return url
     },
     headers(token) {
       const bearer = "Bearer " + token;
