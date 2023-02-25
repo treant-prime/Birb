@@ -45,7 +45,7 @@ export default {
       })
         .then((response) => response.json())
         .then((data) => {
-          let mappedItems = data.items.map((item) => item.snippet.title);
+          let mappedItems = data.items.map((item) => ({title:item.snippet.title, thumbnail: item.snippet.thumbnails.high.url}));
           this.playlists = [...this.playlists, ...mappedItems];
 
           if (data.nextPageToken || forceRun)
@@ -72,9 +72,11 @@ export default {
 </script>
 
 <template lang="pug">
-.col-2.offset-5.h-100vh.d-flex.align-items-center
-  button.btn.btn-primary.btn-block(@click="signIn" type="button") Login
-  h3(v-for="playlist in playlists") {{playlist}}
+.flex.flex-wrap
+  button.btn.btn-primary(@click="signIn" type="button") Login
+  .card.block.mb-2.mr-2(v-for="playlist in playlists")
+    h3.block {{playlist.title}}
+    img.w-40.block(:src="playlist.thumbnail")
 </template>
 
 <style scoped lang="scss"></style>
