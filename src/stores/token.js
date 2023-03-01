@@ -15,7 +15,7 @@ const useTokenStore = defineStore("token", () => {
     token.value = payload;
   }
 
-  function deleteToken(payload) {
+  function deleteToken() {
     window.localStorage.removeItem('token')
     token.value = null;
   }

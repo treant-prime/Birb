@@ -10,13 +10,13 @@ const ITEMS_PER_APGE = 50;
 const playlists = ref([]);
 const tokenStore = useTokenStore()
 
-watch(tokenStore, (currentValue, oldValue) => {
-  if(!!currentValue.token) {
-    fetchPlaylistsPage(currentValue.token, true)
+tokenStore.$subscribe((mutation, state) => {
+  if(!!state.token) {
+    fetchPlaylistsPage(state.token, true)
   } else {
     playlists.value = []
   }
-});
+})
 
 function fetchPlaylistsPage(token, forceRun, nextPageToken) {
   const url = constructFetchPlaylistUrl(nextPageToken)
@@ -28,6 +28,7 @@ function fetchPlaylistsPage(token, forceRun, nextPageToken) {
     .then((data) => {
       let mappedItems = data.items.map((item) => ({title:item.snippet.title, thumbnail: item.snippet.thumbnails.high.url}));
       playlists.value = [...playlists.value, ...mappedItems];
+      playlists.value = playlists.value.sort(sortByTitle)
 
       if (data.nextPageToken || forceRun)
         fetchPlaylistsPage(token, false, data.nextPageToken);
@@ -50,6 +51,17 @@ function headers(token) {
     Accept: "application/json",
   };
 }
+
+function sortByTitle(a, b) {
+  if( a.title > b.title) {
+    return 1;
+  } else {
+    return -1;
+  }
+  return 0;
+}
+
+fetchPlaylistsPage(tokenStore.token, true)
 </script>
 
 <template lang="pug">
