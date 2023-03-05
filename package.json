@@ -8,6 +8,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "daisyui": "^2.51.3",
     "firebase": "^9.8.1",
     "oh-vue-icons": "^1.0.0-rc3",
     "pinia": "^2.0.23",

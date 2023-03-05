@@ -5,10 +5,11 @@ import { createPinia } from "pinia";
 
 import { firebaseApp, db } from "@/database/firebase.js";
 import { OhVueIcon, addIcons } from "oh-vue-icons";
-import { FaKiwiBird, LaUserCircleSolid } from "oh-vue-icons/icons";
+import { FaKiwiBird, LaUserCircleSolid, BiGoogle } from "oh-vue-icons/icons";
+
 import "./assets/main.css";
 
-addIcons(FaKiwiBird, LaUserCircleSolid);
+addIcons(FaKiwiBird, LaUserCircleSolid, BiGoogle);
 
 const app = createApp(App);
 app.config.globalProperties.$firebaseApp = firebaseApp;

@@ -31,9 +31,10 @@ function signIn() {
 </script>
 
 <template lang="pug">
-.modal.flex
-  .card.w-64.block.text-center.m-auto.px-3
-    b.block.mb-1 Welcome to Birb
-    .mb-5 Sign in to archive your playlists in easy 600 steps.
-    button.btn.btn-primary.w-full(@click="signIn" type="button") Sign in with Google
+.fixed-overlay
+  .card.m-auto
+    .card-body
+      b.block Welcome to Birb
+      .mb-2 Sign in to archive your playlists in easy 600 steps.
+      button.btn.w-full(@click="signIn" type="button") Sign in with Google
 </template>

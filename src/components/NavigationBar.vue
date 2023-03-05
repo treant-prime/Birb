@@ -8,11 +8,12 @@ function singOff() {
 </script>
 
 <template lang="pug">
-.navigation.p-2.mb-10.flex.justify-between
+.navigation
   v-icon(name="fa-kiwi-bird" scale="2")
 
-  .rounded-full.bg-blue-500.text-white(v-if="tokenStore.isToken" @click="singOff")
-    v-icon(name="la-user-circle-solid" scale="2")
+  button.btn.btn-sm.gap-2.pl-2(v-if="tokenStore.isToken" @click="singOff" type="button")
+    v-icon(name="la-user-circle-solid" scale="1")
+    .text-xs Sign off
 </template>
 
 <style scoped lang="scss">

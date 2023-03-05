@@ -61,14 +61,26 @@ function sortByTitle(a, b) {
   return 0;
 }
 
-fetchPlaylistsPage(tokenStore.token, true)
+function initialFetch() {
+  if (tokenStore?.token) {
+    fetchPlaylistsPage(tokenStore.token, true)
+  }
+}
+
+initialFetch()
 </script>
 
 <template lang="pug">
 .playlists.flex.flex-wrap.ml-60.mr-60
-  .card.block.mb-3.mr-3.p-0(v-for="playlist in playlists" v-if="playlists.length")
-    h5.block.m-2.ellipsis {{playlist.title}}
-    img.block.w-full(:src="playlist.thumbnail")
+
+  .card.w-96.bg-base-100.shadow-xl.image-full.mb-3.mr-3(v-for="playlist in playlists" v-if="playlists.length")
+    figure
+      img(:src='playlist.thumbnail' alt='Shoes')
+    .card-body
+      h2.card-title {{playlist.title}}
+      p If a dog chews shoes whose shoes does he choose?
+      .card-actions.justify-end
+        button.btn.btn-primary.w-full Archive
 </template>
 
 <style scoped lang="css">
