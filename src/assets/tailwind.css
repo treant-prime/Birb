@@ -22,7 +22,8 @@
     margin-right: 7px;
     word-break: break-word;
     /* max-width: calc((100vw - (30rem + (5*0.80rem)))/5); */
-    max-width: calc(((100vw - 30rem)/5) - 14px);
+    /* max-width: calc(((100vw - 30rem)/5) - 0.80rem); */
+    max-width: calc(((100vw - 30rem)/5) - 17px);
   }
 }
 

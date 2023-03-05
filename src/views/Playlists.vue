@@ -4,12 +4,20 @@
 // const TEST_API_PLAYLIST_ID = "UC_x5XG1OV2P6uZZ5FSM9Ttw";
 
 import { useTokenStore } from '@/stores/token'
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import router from "@/router";
 
 const ITEMS_PER_APGE = 50;
 const playlists = ref([]);
+const search = ref('')
 const tokenStore = useTokenStore()
+
+const playlistsComputed = computed(() => {
+  const filteredPlaylists = playlists.value.filter(item => {
+    return item.title.toLowerCase().includes(search.value.toLowerCase())
+  })
+  return filteredPlaylists
+})
 
 tokenStore.$subscribe((mutation, state) => {
   if(!!state.token) {
@@ -81,11 +89,11 @@ initialFetch()
 </script>
 
 <template lang="pug">
-.playlists.flex.flex-wrap.ml-60.mr-60(v-if="playlists.length")
-  input.input.input-bordered.input-primary.w-96.ml-auto.mr-auto.mt-10.mb-10(type='text' placeholder='Type here')
+.playlists.flex.flex-wrap.ml-60.mr-60()
+  input.input.input-bordered.input-primary.w-96.ml-auto.mr-auto.mt-10.mb-10(type='text' placeholder='Type here' v-model="search")
 
-  .flex.flex-wrap
-    .card.playlist-card.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer(v-for="playlist in playlists" @click="goToPlaylist(playlist.id)")
+  .flex.flex-wrap.w-full
+    .card.playlist-card.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer(v-for="playlist in playlistsComputed" @click="goToPlaylist(playlist.id)")
       figure
         img(:src='playlist.thumbnail' alt='Shoes')
       .card-body
