@@ -8,6 +8,11 @@ const router = createRouter({
       name: "Playlists",
       component: () => import("../views/Playlists.vue"),
     },
+    {
+      path: "/:id",
+      name: "Playlist",
+      component: () => import("../views/Playlist.vue"),
+    },
   ],
 });
 

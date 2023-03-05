@@ -9,7 +9,7 @@ function singOff() {
 
 <template lang="pug">
 .navigation
-  v-icon(name="fa-kiwi-bird" scale="2")
+  v-icon.cursor-pointer(name="fa-kiwi-bird" scale="2" @click="$router.push({ name: 'Playlists' })")
 
   button.btn.btn-sm.gap-2.pl-2(v-if="tokenStore.isToken" @click="singOff" type="button")
     v-icon(name="la-user-circle-solid" scale="1")

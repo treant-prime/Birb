@@ -8,17 +8,20 @@
     @apply dark:bg-black;
   }
 
+  .navigation {
+    @apply p-2 flex justify-between items-center;
+  }
+
   .card {
     @apply w-96 bg-base-100 shadow-xl dark:bg-black;
   }
 
-  .navigation {
-    @apply p-2 mb-10 flex justify-between items-center;
-  }
-
-  .card {
-    @apply break-words;
+  .playlist-card {
+    @apply card bg-base-100 shadow-xl dark:bg-black break-words;
+    margin-left: 0.4rem;
+    margin-right: 0.4rem;
     word-break: break-word;
+    max-width: calc((100vw - (30rem + (5*0.80rem)))/5);
   }
 }
 

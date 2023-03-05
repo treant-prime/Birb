@@ -4,7 +4,8 @@
 // const TEST_API_PLAYLIST_ID = "UC_x5XG1OV2P6uZZ5FSM9Ttw";
 
 import { useTokenStore } from '@/stores/token'
-import { ref, watch } from "vue";
+import { ref } from "vue";
+import router from "@/router";
 
 const ITEMS_PER_APGE = 50;
 const playlists = ref([]);
@@ -26,7 +27,12 @@ function fetchPlaylistsPage(token, forceRun, nextPageToken) {
   })
     .then((response) => response.json())
     .then((data) => {
-      let mappedItems = data.items.map((item) => ({title:item.snippet.title, thumbnail: item.snippet.thumbnails.high.url}));
+      let mappedItems = data.items.map((item) => ({
+        title: item.snippet.title,
+        thumbnail: item.snippet.thumbnails.medium.url,
+        itemCount: item.contentDetails.itemCount,
+        id: item.id
+      }));
       playlists.value = [...playlists.value, ...mappedItems];
       playlists.value = playlists.value.sort(sortByTitle)
 
@@ -38,7 +44,7 @@ function fetchPlaylistsPage(token, forceRun, nextPageToken) {
 function constructFetchPlaylistUrl(nextPageToken) {
   // url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${ITEMS_PER_APGE}&pageToken=${nextPageToken}`;
   // Important: Po autoryzacji API_KEY nie jest juz potrzebny
-  const part = "id,snippet,status";
+  const part = "id,snippet,status,contentDetails";
   let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=${ITEMS_PER_APGE}`;
   if(nextPageToken) url = url + `&pageToken=${nextPageToken}`;
   return url
@@ -67,24 +73,24 @@ function initialFetch() {
   }
 }
 
+function goToPlaylist(id) {
+  router.push({ name: 'Playlist', params: { id } })
+}
+
 initialFetch()
 </script>
 
 <template lang="pug">
-.playlists.flex.flex-wrap.ml-60.mr-60
+.playlists.flex.flex-wrap.ml-60.mr-60(v-if="playlists.length")
+  input.input.input-bordered.input-primary.w-96.ml-auto.mr-auto.mt-10.mb-10(type='text' placeholder='Type here')
 
-  .card.w-96.bg-base-100.shadow-xl.image-full.mb-3.mr-3(v-for="playlist in playlists" v-if="playlists.length")
-    figure
-      img(:src='playlist.thumbnail' alt='Shoes')
-    .card-body
-      h2.card-title {{playlist.title}}
-      p If a dog chews shoes whose shoes does he choose?
-      .card-actions.justify-end
-        button.btn.btn-primary.w-full Archive
+  .flex.flex-wrap
+    .card.playlist-card.w-96.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer(v-for="playlist in playlists" @click="goToPlaylist(playlist.id)")
+      figure
+        img(:src='playlist.thumbnail' alt='Shoes')
+      .card-body
+        h2.card-title {{playlist.title}}
+        p {{playlist.itemCount}} items in this playlist.
+        .card-actions.justify-end
+          button.btn.btn-primary.w-full Archive
 </template>
-
-<style scoped lang="css">
-.playlists .card {
-  width: calc((100vw - (30rem + (5*0.75rem)))/5)
-}
-</style>
