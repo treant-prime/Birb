@@ -85,7 +85,7 @@ initialFetch()
   input.input.input-bordered.input-primary.w-96.ml-auto.mr-auto.mt-10.mb-10(type='text' placeholder='Type here')
 
   .flex.flex-wrap
-    .card.playlist-card.w-96.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer(v-for="playlist in playlists" @click="goToPlaylist(playlist.id)")
+    .card.playlist-card.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer(v-for="playlist in playlists" @click="goToPlaylist(playlist.id)")
       figure
         img(:src='playlist.thumbnail' alt='Shoes')
       .card-body
