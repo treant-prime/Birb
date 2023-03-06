@@ -89,7 +89,7 @@ initialFetch()
 </script>
 
 <template lang="pug">
-.playlists.flex.flex-wrap.ml-60.mr-60()
+.playlists.flex.flex-wrap.ml-60.mr-60(v-if="playlists.length")
   input.input.input-bordered.input-primary.w-96.ml-auto.mr-auto.mt-10.mb-10(type='text' placeholder='Type here' v-model="search")
 
   .flex.flex-wrap.w-full
