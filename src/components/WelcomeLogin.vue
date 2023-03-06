@@ -1,5 +1,5 @@
 <script setup>
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, setPersistence, signInWithPopup, GoogleAuthProvider, browserLocalPersistence } from "firebase/auth";
 
 import { useTokenStore } from '@/stores/token'
 
@@ -10,12 +10,22 @@ function setToken(payload) {
 }
 
 function signIn() {
-  const provider = new GoogleAuthProvider();
-  provider.addScope("https://www.googleapis.com/auth/youtube.readonly");
   const auth = getAuth();
   auth.useDeviceLanguage();
 
-  signInWithPopup(auth, provider)
+  const persistenceSetter = () => {
+    return setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        const provider = new GoogleAuthProvider();
+        provider.addScope("https://www.googleapis.com/auth/youtube.readonly");
+        return signInWithPopup(auth, provider)
+      })
+      .catch(() => {
+        console.log("SetPersistence failed");
+      });
+  }
+
+  persistenceSetter()
     .then((result) => {
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
