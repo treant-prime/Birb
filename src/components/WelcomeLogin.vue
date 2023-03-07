@@ -10,7 +10,7 @@ function setToken(payload) {
 }
 
 function signIn() {
-  const auth = getAuth();
+  const auth = getAuth(window.firebaseApp);
   auth.useDeviceLanguage();
 
   const persistenceSetter = () => {

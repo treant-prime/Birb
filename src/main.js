@@ -12,8 +12,11 @@ import "./assets/main.css";
 addIcons(FaKiwiBird, LaUserCircleSolid, BiGoogle);
 
 const app = createApp(App);
-app.config.globalProperties.$firebaseApp = firebaseApp;
-app.config.globalProperties.$db = db;
+// app.config.globalProperties.$firebaseApp = firebaseApp;
+// app.config.globalProperties.$db = db;
+
+window.firebaseApp = firebaseApp;
+window.db = db;
 
 app.component("v-icon", OhVueIcon);
 app.use(createPinia());
