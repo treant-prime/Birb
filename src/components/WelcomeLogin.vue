@@ -17,7 +17,9 @@ function signIn() {
     return setPersistence(auth, browserLocalPersistence)
       .then(() => {
         const provider = new GoogleAuthProvider();
+        provider.addScope("https://www.googleapis.com/auth/youtube");
         provider.addScope("https://www.googleapis.com/auth/youtube.readonly");
+        // provider.addScope("https://www.googleapis.com/auth/youtube.force-ssl");
         return signInWithPopup(auth, provider)
       })
       .catch(() => {

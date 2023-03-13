@@ -77,3 +77,9 @@ h1, h2, h3, h4, h5, h6 {
     width: calc((100%)/5 - 14px);
   }
 }
+
+/* https://daisyui.com/docs/colors/ */
+tr.bg-zinc-600 td {
+  background: hsl(var(--p));
+  border-color: hsl(var(--pf));
+}
