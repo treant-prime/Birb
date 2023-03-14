@@ -20,18 +20,20 @@ const playlistsComputed = computed(() => {
 })
 
 tokenStore.$subscribe((mutation, state) => {
+  console.log('state', state)
+  console.log('state.token', state?.token)
   if(!!state.token) {
-    fetchPlaylistsPage(state.token, true)
+    fetchPlaylistsPage(state.token)
   } else {
     playlists.value = []
   }
 })
 
-function fetchPlaylistsPage(token, forceRun, nextPageToken) {
+function fetchPlaylistsPage(authToken, nextPageToken=null) {
   const url = constructFetchPlaylistUrl(nextPageToken)
 
   fetch(url, {
-    headers: headers(token),
+    headers: headers(authToken),
   })
     .then((response) => response.json())
     .then((data) => {
@@ -44,8 +46,8 @@ function fetchPlaylistsPage(token, forceRun, nextPageToken) {
       playlists.value = [...playlists.value, ...mappedItems];
       playlists.value = playlists.value.sort(sortByTitle)
 
-      if (data.nextPageToken || forceRun)
-        fetchPlaylistsPage(token, false, data.nextPageToken);
+      if (data.nextPageToken)
+        fetchPlaylistsPage(authToken, data.nextPageToken);
     });
 }
 
@@ -77,7 +79,7 @@ function sortByTitle(a, b) {
 
 function initialFetch() {
   if (tokenStore?.token) {
-    fetchPlaylistsPage(tokenStore.token, true)
+    fetchPlaylistsPage(tokenStore.token)
   }
 }
 

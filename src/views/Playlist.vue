@@ -2,25 +2,30 @@
 import { useTokenStore } from '@/stores/token'
 import { ref } from "vue";
 import router from '@/router'
+import { headers } from "@/helpers"
 
 const ITEMS_PER_APGE = 50;
 const playlistItems = ref([]);
-const tokenStore = useTokenStore()
+const tokenStore = useTokenStore();
+
+const selectedPlaylistItem = ref(null);
+const newVideoCode = ref('');
 
 tokenStore.$subscribe((mutation, state) => {
+  console.log('state', state)
+  console.log('state.token', state?.token)
   if(!!state.token) {
-    console.log('111')
-    fetchPlaylistItemsPage(state.token, true)
+    fetchPlaylistItemsPage(state.token)
   } else {
     playlistItems.value = []
   }
 })
 
-function fetchPlaylistItemsPage(token, forceRun, nextPageToken) {
+function fetchPlaylistItemsPage(authToken, nextPageToken=null) {
   const url = constructUrl(nextPageToken)
 
   fetch(url, {
-    headers: headers(token),
+    headers: headers(authToken),
   })
     .then((response) => response.json())
     .then((data) => {
@@ -35,8 +40,8 @@ function fetchPlaylistItemsPage(token, forceRun, nextPageToken) {
       }));
       playlistItems.value = [...playlistItems.value, ...mappedItems];
 
-      if (data.nextPageToken || forceRun)
-        fetchPlaylistItemsPage(token, false, data.nextPageToken);
+      if (data.nextPageToken)
+        fetchPlaylistItemsPage(authToken, data.nextPageToken);
     });
 }
 
@@ -48,71 +53,82 @@ function constructUrl(nextPageToken) {
   return url
 }
 
-function headers(token) {
-  const bearer = "Bearer " + token;
-  return {
-    Authorization: bearer,
-    Accept: "application/json",
-  };
-}
+function swapVideo(playlistItem) {
+  const playlistItemIdToDelete = playlistItem.id
 
-function initialFetch() {
-  if (tokenStore?.token) {
-    fetchPlaylistItemsPage(tokenStore.token, true)
-  }
-}
+  const videoId = newVideoCode.value
+  const position = playlistItem.position
+  const playlistId = router.currentRoute.value.params.id
 
-function insertHardcoded(videoId) {
+  // const generateBody
   const body = {
     "snippet": {
-      "playlistId": router.currentRoute.value.params.id,
+      "playlistId": playlistId,
       "resourceId": {
         "kind": "youtube#video",
         "videoId": videoId
       },
-      "position": 1
+      "position": position
     }
   }
 
-  const url = constructPostUrl()
-  console.log('body', body)
+  const url = constructPostUrl(playlistId)
 
   fetch(url, {
     headers: headers(tokenStore.token),
     method: "POST",
     body: JSON.stringify(body),
   })
-    .then((response) => response.json())
-    .then((data) => {
-
-    });
+    .then(() => {
+      console.log('swapVideo success')
+      deleteVideo(playlistItemIdToDelete)
+    })
+    .catch(() => {
+      console.log('swapVideo fail')
+    })
+    .finally(() => {
+      selectedPlaylistItem.value = null
+    })
 }
 
-function constructPostUrl() {
-  const playlistId = router.currentRoute.value.params.id
+function constructPostUrl(playlistId) {
   const part = "snippet,id,contentDetails,status";
-  let url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}`;
-  return url
+  return `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}`;
 }
 
-function constructDeletUrl(id) {
-  const playlistId = router.currentRoute.value.params.id
-  const part = "snippet,id,contentDetails,status";
-  let url = `https://youtube.googleapis.com/youtube/v3/playlistItems?id=${id}`;
-  return url
-}
-
-function deleteVideo(id) {
-  const url = constructDeletUrl(id)
-
+function deleteVideo(playlistItemId) {
+  const url = deletetUrl(playlistItemId)
   fetch(url, {
     headers: headers(tokenStore.token),
     method: "DELETE",
   })
-    .then((response) => response.json())
-    .then((data) => {
-
+    .then((response) => {
+      console.log('response', response);
+      console.log('deleteVideo success');
+      refetch()
+    })
+    .catch((error) => {
+      console.log("deleteVideo fail", error);
     });
+}
+
+function deletetUrl(playlistItemId) {
+  return`https://youtube.googleapis.com/youtube/v3/playlistItems?id=${playlistItemId}`;
+}
+
+function initialFetch() {
+  if (tokenStore?.token) {
+    fetchPlaylistItemsPage(tokenStore.token)
+  }
+}
+
+function selectPlaylistItem(playlistItem) {
+  selectedPlaylistItem.value = playlistItem
+}
+
+function refetch() {
+  playlistItems.value = []
+  initialFetch()
 }
 
 initialFetch()
@@ -120,8 +136,18 @@ initialFetch()
 
 <template lang="pug">
 .overflow-x-auto.w-full
+  .fixed-overlay(v-if="selectedPlaylistItem")
+    .card.m-auto
+      .card-body
+        h2 Enter video URL
+        span {{ selectedPlaylistItem.title }}
+        .input-group
+          input.input.input-bordered.input-sm.w-full(type='text' placeholder='Video URL' v-model="newVideoCode")
+          button.btn.btn-square.btn-sm(@click="swapVideo(selectedPlaylistItem)")
+            svg.h-6.w-6(xmlns='http://www.w3.org/2000/svg' fill='none' viewbox='0 0 24 24' stroke='currentColor')
+              path(stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z')
+
   table.table.w-full
-    // head
     thead
       tr
         th Position
@@ -130,9 +156,8 @@ initialFetch()
             input.checkbox(type='checkbox')
         th Title
         th
-        th Description
+        //- th Description
     tbody
-      // row 1
       tr(v-for="playlistItem in playlistItems" :class="{ 'bg-zinc-600': playlistItem.isNotAvailable}")
         td
           div {{ playlistItem.position }}
@@ -157,13 +182,10 @@ initialFetch()
               svg.h-6.w-6(xmlns='http://www.w3.org/2000/svg' fill='none' viewbox='0 0 24 24' stroke='currentColor')
                 path(stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12')
 
-            .form-control(v-if="playlistItem.isNotAvailable")
-              .input-group
-                input.input.input-bordered.input-sm(type='text' placeholder='Search…')
-                button.btn.btn-square.btn-sm(@click="insertHardcoded('WmRtNpl-M9I')")
-                  svg.h-6.w-6(xmlns='http://www.w3.org/2000/svg' fill='none' viewbox='0 0 24 24' stroke='currentColor')
-                    path(stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z')
-
-        td
-          div {{playlistItem.description}}
+            //- button.btn.btn-circle.btn-sm.mr-3(type="button" @click="selectPlaylistItem(playlistItem)" v-if="playlistItem.isNotAvailable")
+            button.btn.btn-circle.btn-sm.mr-3(type="button" @click="selectPlaylistItem(playlistItem)")
+              svg.h-6.w-6(xmlns='http://www.w3.org/2000/svg' fill='none' viewbox='0 0 24 24' stroke='currentColor')
+                path(stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z')
+        //- td
+        //-   div {{playlistItem.description}}
 </template>

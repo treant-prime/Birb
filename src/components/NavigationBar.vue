@@ -1,9 +1,11 @@
 <script setup>
 import { useTokenStore } from '@/stores/token'
+import router from '@/router'
 const tokenStore = useTokenStore()
 
 function singOff() {
   tokenStore.deleteToken()
+  router.push({ name: 'Playlists' })
 }
 </script>
 
@@ -15,7 +17,3 @@ function singOff() {
     v-icon(name="la-user-circle-solid" scale="1")
     .text-xs Sign off
 </template>
-
-<style scoped lang="scss">
-
-</style>
