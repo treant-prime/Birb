@@ -44,6 +44,8 @@ h1, h2, h3, h4, h5, h6 {
   width: 100vw;
   z-index: 1;
   display: flex;
+  top: 0;
+  background: rgb(40 18 51 / 20%);
 }
 
 .ellipsis {
@@ -79,7 +81,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* https://daisyui.com/docs/colors/ */
-tr.bg-zinc-600 td {
-  background: hsl(var(--p));
-  border-color: hsl(var(--pf));
+tr.bg-deleted td {
+  background: hsl(var(--b2));
+  border-color: hsl(var(--b3));
+}
+
+/* wierd tailwind/daisy behavior */
+.table th:first-child {
+  z-index: 0;
 }
