@@ -11,7 +11,9 @@ function singOff() {
 
 <template lang="pug">
 .navigation
-  v-icon.cursor-pointer(name="fa-kiwi-bird" scale="2" @click="$router.push({ name: 'Playlists' })")
+  .flex.items-center.justify-center.cursor-pointer(@click="$router.push({ name: 'Playlists' })")
+    v-icon(name="fa-kiwi-bird" scale="2")
+    h2.font-bold.ml-2.mb-0 Birb
 
   button.btn.btn-sm.gap-2.pl-2(v-if="tokenStore.isToken" @click="singOff" type="button")
     v-icon(name="la-user-circle-solid" scale="1")

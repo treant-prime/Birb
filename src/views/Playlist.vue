@@ -105,7 +105,7 @@ initialFetch()
 .overflow-x-auto.w-full
   replace-video-modal(:playlistItemToReplace="playlistItemToReplace" v-if="playlistItemToReplace" @close="closeModal" @deleteVideo="deleteVideo($event)")
 
-  table.table.w-full
+  table.table
     thead
       tr
         th.w-12 Position
@@ -123,7 +123,7 @@ initialFetch()
                 .bg-secondary.w-12.h-12.flex.items-center.justify-center(v-else)
                   v-icon(name="gi-tombstone" scale="1.5")
             div.w-full
-              .font-bold {{playlistItem.title}}
+              .font-bold.table-title {{ playlistItem.title }}
               .text-sm.opacity-50(v-if="playlistItem.isNotAvailable")
                 a(:href="`https://www.google.com/search?q=${playlistItem.videoId}`" target="_blank") Google for video ID
 

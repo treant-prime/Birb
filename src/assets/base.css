@@ -86,7 +86,19 @@ tr.bg-deleted td {
   border-color: hsl(var(--b3));
 }
 
+.table {
+  width: 96vw;
+  margin: auto;
+}
+
 /* wierd tailwind/daisy behavior */
 .table th:first-child {
   z-index: 0;
+}
+
+.table .table-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 60vw;
 }

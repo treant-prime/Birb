@@ -9,7 +9,9 @@
   }
 
   .navigation {
-    @apply p-2 flex justify-between items-center;
+    @apply p-3 flex justify-between items-center;
+    padding-left: 2vw;
+    padding-right: 2vw;
   }
 
   .card {
