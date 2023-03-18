@@ -15,7 +15,17 @@
   }
 
   .card {
-    @apply w-96 bg-base-100 shadow-xl dark:bg-black;
+    @apply w-96 bg-base-100 shadow-xl dark:bg-black relative;
+  }
+
+  .card-body .playlist-items {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
+  .card .card-title {
+    line-height: 1.2;
   }
 
   .playlist-card {

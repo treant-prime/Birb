@@ -54,7 +54,8 @@ function fetchPlaylistsPage(authToken, nextPageToken=null) {
 function constructFetchPlaylistUrl(nextPageToken) {
   // url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${ITEMS_PER_APGE}&pageToken=${nextPageToken}`;
   // Important: Po autoryzacji API_KEY nie jest juz potrzebny
-  const part = "id,snippet,status,contentDetails";
+  // const part = "id,snippet,status,contentDetails";
+  const part = "id,snippet,contentDetails";
   let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=${ITEMS_PER_APGE}`;
   if(nextPageToken) url = url + `&pageToken=${nextPageToken}`;
   return url
@@ -92,15 +93,13 @@ initialFetch()
 
 <template lang="pug">
 .playlists.flex.flex-wrap.ml-60.mr-60(v-if="playlists.length")
-  input.input.input-bordered.input-primary.w-96.ml-auto.mr-auto.mt-10.mb-10(type='text' placeholder='Type here' v-model="search")
+  input.input.input-bordered.w-96.ml-auto.mr-auto.mt-10.mb-10.text-center(type='text' placeholder='Search playlist  ' v-model="search")
 
   .flex.flex-wrap.w-full
     .card.playlist-card.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer(v-for="playlist in playlistsComputed" @click="goToPlaylist(playlist.id)")
       figure
-        img(:src='playlist.thumbnail' alt='Shoes')
-      .card-body
+        img(:src='playlist.thumbnail' alt='Playlist thumbnail')
+      .card-body.h-64
         h2.card-title {{playlist.title}}
-        p {{playlist.itemCount}} items in this playlist.
-        .card-actions.justify-end
-          button.btn.btn-primary.w-full Archive
+        .playlist-items.mask.mask-squircle.font-semibold.text-secondary-content.bg-primary.text-xs.m-4.p-3 {{playlist.itemCount}}
 </template>

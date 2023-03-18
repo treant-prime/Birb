@@ -17,5 +17,5 @@ function singOff() {
 
   button.btn.btn-sm.gap-2.pl-2(v-if="tokenStore.isToken" @click="singOff" type="button")
     v-icon(name="la-user-circle-solid" scale="1")
-    .text-xs Sign off
+    span SIGN OFF
 </template>

@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import Playlists from "@/views/Playlists.vue"
+import Playlist from "@/views/Playlist.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -6,12 +8,12 @@ const router = createRouter({
     {
       path: "/",
       name: "Playlists",
-      component: () => import("../views/Playlists.vue"),
+      component: Playlists,
     },
     {
       path: "/:id",
       name: "Playlist",
-      component: () => import("../views/Playlist.vue"),
+      component: Playlist,
     },
   ],
 });

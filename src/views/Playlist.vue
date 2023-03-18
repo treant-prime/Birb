@@ -114,7 +114,7 @@ initialFetch()
     tbody
       tr(v-for="playlistItem in playlistItems" :class="{ 'bg-deleted': playlistItem.isNotAvailable}")
         td
-          .text-zinc-500.h-8.w-8.radius.rounded-full.font-semibold.bg-base-300.flex.justify-center.items-center.text-xs {{ playlistItem.position }}
+          .text-zinc-500.h-8.w-8.radius.rounded-full.font-semibold.bg-base-300.flex.justify-center.items-center.text-xs {{ playlistItem.position + 1 }}
         td
           .flex.items-center.space-x-3
             .avatar
@@ -123,9 +123,19 @@ initialFetch()
                 .bg-secondary.w-12.h-12.flex.items-center.justify-center(v-else)
                   v-icon(name="gi-tombstone" scale="1.5")
             div.w-full
-              .font-bold.table-title {{ playlistItem.title }}
-              .text-sm.opacity-50(v-if="playlistItem.isNotAvailable")
-                a(:href="`https://www.google.com/search?q=${playlistItem.videoId}`" target="_blank") Google for video ID
+              template(v-if="!playlistItem.isNotAvailable")
+                .font-bold.table-title {{ playlistItem.title }}
+                //- .text-sm.opacity-50(v-if="playlistItem.isNotAvailable")
+                //-   a(:href="`https://www.google.com/search?q=${playlistItem.videoId}`" target="_blank") Google for video ID
+
+              .rounded-lg.ml-6(v-else style="margin-top: -6px;")
+                .font-semibold.text-xs.text-zinc-500.inline-block FIND VIDEO:
+                div
+                  a.btn-circle.btn-sm.btn-active.btn-ghost.inline-flex.items-center.justify-center(:href='`https://www.google.com/search?q="${playlistItem.videoId}"`' target="_blank")
+                    v-icon(name="fa-google" scale="1")
+
+                  a.btn-circle.btn-sm.btn-active.btn-ghost.inline-flex.items-center.justify-center.ml-2(:href="`https://web.archive.org/web/*/https://www.youtube.com/watch?v=${playlistItem.videoId}`" target="_blank")
+                    v-icon(name="ai-archive" scale="1")
 
         td
           .flex.items-center
