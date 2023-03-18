@@ -4,6 +4,7 @@
 // const TEST_API_PLAYLIST_ID = "UC_x5XG1OV2P6uZZ5FSM9Ttw";
 
 import { useTokenStore } from '@/stores/token'
+import { usePlaylistsStore } from '@/stores/playlists'
 import { ref, computed } from "vue";
 import router from "@/router";
 
@@ -11,6 +12,7 @@ const ITEMS_PER_APGE = 50;
 const playlists = ref([]);
 const search = ref('')
 const tokenStore = useTokenStore()
+const playlistsStore = usePlaylistsStore()
 
 const playlistsComputed = computed(() => {
   const filteredPlaylists = playlists.value.filter(item => {
@@ -46,9 +48,16 @@ function fetchPlaylistsPage(authToken, nextPageToken=null) {
       playlists.value = [...playlists.value, ...mappedItems];
       playlists.value = playlists.value.sort(sortByTitle)
 
-      if (data.nextPageToken)
+      if (data.nextPageToken) {
         fetchPlaylistsPage(authToken, data.nextPageToken);
+      } else {
+        savePlaylistInStore(data)
+      }
     });
+}
+
+function savePlaylistInStore(data) {
+  playlistsStore.setPlaylists(playlists.value)
 }
 
 function constructFetchPlaylistUrl(nextPageToken) {

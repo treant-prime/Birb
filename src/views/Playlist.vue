@@ -1,6 +1,7 @@
 <script setup>
 import { useTokenStore } from '@/stores/token'
-import { ref } from "vue";
+import { usePlaylistsStore } from '@/stores/playlists'
+import { ref, computed } from "vue";
 import router from '@/router'
 import { headers } from "@/helpers"
 import ReplaceVideoModal from '@/components/ReplaceVideoModal.vue'
@@ -8,7 +9,17 @@ import ReplaceVideoModal from '@/components/ReplaceVideoModal.vue'
 const ITEMS_PER_APGE = 50;
 const playlistItems = ref([]);
 const tokenStore = useTokenStore();
+const playlistsStore = usePlaylistsStore();
 const playlistItemToReplace = ref(null);
+
+const playlists  = ref([]);
+
+// playlistsStore.$subscribe((mutation, state) => {
+//   console.log('state', state)
+//   console.log('state.token', state?.playlists)
+// })
+
+console.log('playlistsStore.playlists', playlistsStore.playlists)
 
 tokenStore.$subscribe((mutation, state) => {
   if(!!state.token) {
@@ -17,6 +28,55 @@ tokenStore.$subscribe((mutation, state) => {
     playlistItems.value = []
   }
 })
+
+if (!playlistsStore?.playlists) {
+  fetchPlaylistsPage(tokenStore.token)
+}
+
+const currentPlaylist = computed(() => {
+  return playlistsStore.playlists?.find(item => item.id == router.currentRoute.value.params.id)
+})
+
+// PPPP
+function fetchPlaylistsPage(authToken, nextPageToken=null) {
+  const url = constructFetchPlaylistUrl(nextPageToken)
+
+  fetch(url, {
+    headers: headers(authToken),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      let mappedItems = data.items.map((item) => ({
+        title: item.snippet.title,
+        thumbnail: item.snippet.thumbnails.medium.url,
+        itemCount: item.contentDetails.itemCount,
+        id: item.id
+      }));
+      playlists.value = [...playlists.value, ...mappedItems];
+      // playlists.value = playlists.value.sort(sortByTitle)
+
+      if (data.nextPageToken) {
+        fetchPlaylistsPage(authToken, data.nextPageToken);
+      } else {
+        savePlaylistInStore(data)
+      }
+    });
+}
+
+function savePlaylistInStore(data) {
+  playlistsStore.setPlaylists(playlists.value)
+}
+
+function constructFetchPlaylistUrl(nextPageToken) {
+  // url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${ITEMS_PER_APGE}&pageToken=${nextPageToken}`;
+  // Important: Po autoryzacji API_KEY nie jest juz potrzebny
+  // const part = "id,snippet,status,contentDetails";
+  const part = "id,snippet,contentDetails";
+  let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=50`;
+  if(nextPageToken) url = url + `&pageToken=${nextPageToken}`;
+  return url
+}
+// PPPP
 
 function fetchPlaylistItemsPage(authToken, nextPageToken=null) {
   const url = constructUrl(nextPageToken)
@@ -102,6 +162,10 @@ initialFetch()
 </script>
 
 <template lang="pug">
+
+.mx-8.my-4.flex.justify-between.items-end.leading-normal(v-if="currentPlaylist")
+  h2.font-bold.block.mb-0 {{ currentPlaylist.title }}
+  h3.font-bold.block.text-secondary.mb-0 {{ currentPlaylist.itemCount }} ITEMS
 .overflow-x-auto.w-full
   replace-video-modal(:playlistItemToReplace="playlistItemToReplace" v-if="playlistItemToReplace" @close="closeModal" @deleteVideo="deleteVideo($event)")
 
