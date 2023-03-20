@@ -165,6 +165,12 @@ tr.bg-deleted td {
     margin-left: 1rem;
     margin-right: 1rem;
   }
+
+  .playlist-title h2, .playlist-title h3 {
+    font-size: 1rem;
+    font-size: 1rem;
+    line-height: 1;
+  }
 }
 
 .search {
