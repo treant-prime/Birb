@@ -173,7 +173,7 @@ initialFetch()
 
 .playlist-title.my-4.flex.justify-between.items-end.leading-normal(v-if="currentPlaylist")
   h2.font-bold.block.mb-0 {{ currentPlaylist.title }}
-  h3.font-bold.block.text-secondary.mb-0 {{ currentPlaylist.itemCount }} ITEMS
+  h3.font-bold.block.text-secondary.mb-0.ml-3.text-right {{ currentPlaylist.itemCount }} ITEMS
 .overflow-x-auto.w-full
   replace-video-modal(:playlistItemToReplace="playlistItemToReplace" v-if="playlistItemToReplace" @close="closeModal" @deleteVideo="deleteVideo($event)")
 
