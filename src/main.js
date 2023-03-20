@@ -9,6 +9,8 @@ import { FaKiwiBird, LaUserCircleSolid, BiGoogle, GiTombstone, BiBandaid, IoClos
 
 import "./assets/main.css";
 
+import BlockerCmp from "./components/BlockerCmp.vue"
+
 addIcons(FaKiwiBird, LaUserCircleSolid, BiGoogle, GiTombstone, BiBandaid, IoClose, FaGoogle, AiArchive);
 
 const app = createApp(App);
@@ -19,6 +21,7 @@ window.firebaseApp = firebaseApp;
 window.db = db;
 
 app.component("v-icon", OhVueIcon);
+app.component("blocker-cmp", BlockerCmp);
 app.use(createPinia());
 app.use(router);
 app.mount("#app");

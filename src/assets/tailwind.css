@@ -10,8 +10,15 @@
 
   .navigation {
     @apply p-3 flex justify-between items-center;
-    padding-left: 2vw;
-    padding-right: 2vw;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media screen and (max-width: 900px) {
+    .navigation {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
   }
 
   .card {

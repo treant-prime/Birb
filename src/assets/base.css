@@ -16,6 +16,12 @@ body {
   padding-bottom: 10rem;
 }
 
+@media screen and (max-width: 900px) {
+  #app {
+    background-size: cover;
+  }
+}
+
 h1 {
   font-size: 3rem;
 }
@@ -80,6 +86,15 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@media screen and (max-width: 900px) {
+  .playlist-card {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    max-width: calc((100%) - 1rem);
+    width: calc((100%) - 1rem);
+  }
+}
+
 /* https://daisyui.com/docs/colors/ */
 tr.bg-deleted td {
   background: hsl(var(--b2));
@@ -87,8 +102,15 @@ tr.bg-deleted td {
 }
 
 .table {
-  width: 96vw;
+  width: calc(100% - 3rem);
   margin: auto;
+}
+
+@media screen and (max-width: 900px) {
+  .table {
+    width: 100%;
+    margin: 0;
+  }
 }
 
 /* wierd tailwind/daisy behavior */
@@ -102,3 +124,60 @@ tr.bg-deleted td {
   text-overflow: ellipsis;
   width: 60vw;
 }
+
+.blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(255 255 255 / 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.playlists {
+  margin-right: 15rem;
+  margin-left: 15rem;
+}
+
+@media screen and (max-width: 900px) {
+  .playlists {
+    margin: 0px;
+  }
+}
+
+.table td, .table th {
+  position: sticky;
+  position: -webkit-sticky;
+  left: 0px;
+}
+
+.playlist-title {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
+@media screen and (max-width: 900px) {
+  .playlist-title {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+
+.search {
+  width: 24rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media screen and (max-width: 900px) {
+  .search {
+    width: 100%;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+

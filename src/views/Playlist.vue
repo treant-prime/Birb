@@ -11,7 +11,7 @@ const playlistItems = ref([]);
 const tokenStore = useTokenStore();
 const playlistsStore = usePlaylistsStore();
 const playlistItemToReplace = ref(null);
-
+const blocker = ref(false);
 const playlists  = ref([]);
 
 // playlistsStore.$subscribe((mutation, state) => {
@@ -80,6 +80,7 @@ function constructFetchPlaylistUrl(nextPageToken) {
 
 function fetchPlaylistItemsPage(authToken, nextPageToken=null) {
   const url = constructUrl(nextPageToken)
+  blocker.value = true
 
   fetch(url, {
     headers: headers(authToken),
@@ -99,7 +100,10 @@ function fetchPlaylistItemsPage(authToken, nextPageToken=null) {
 
       if (data.nextPageToken)
         fetchPlaylistItemsPage(authToken, data.nextPageToken);
-    });
+
+    }).finally(() => {
+      blocker.value = false
+    })
 }
 
 function constructUrl(nextPageToken) {
@@ -119,6 +123,7 @@ function confirmationDeletion(playlistItemId) {
 function deleteVideo(playlistItemId) {
   const url = deletetUrl(playlistItemId)
   console.log('playlistItemId', playlistItemId)
+  blocker.value = true
 
   fetch(url, {
     headers: headers(tokenStore.token),
@@ -132,7 +137,10 @@ function deleteVideo(playlistItemId) {
     })
     .catch((error) => {
       console.log("deleteVideo fail", error);
-    });
+    })
+    .finally(() => {
+      blocker.value = false
+    })
 }
 
 function deletetUrl(playlistItemId) {
@@ -163,7 +171,7 @@ initialFetch()
 
 <template lang="pug">
 
-.mx-8.my-4.flex.justify-between.items-end.leading-normal(v-if="currentPlaylist")
+.playlist-title.my-4.flex.justify-between.items-end.leading-normal(v-if="currentPlaylist")
   h2.font-bold.block.mb-0 {{ currentPlaylist.title }}
   h3.font-bold.block.text-secondary.mb-0 {{ currentPlaylist.itemCount }} ITEMS
 .overflow-x-auto.w-full
@@ -203,11 +211,13 @@ initialFetch()
 
         td
           .flex.items-center
-            button.btn.btn-secondary.btn-sm.mr-3.pl-2(type="button" @click="openReplaceVideoModal(playlistItem)")
+            button.btn.btn-secondary.btn-sm.mr-3.pl-2.block(type="button" @click="openReplaceVideoModal(playlistItem)")
               v-icon.mr-1(name="bi-bandaid" scale="0.8")
               span PATCH
 
-            button.btn.btn-outline.btn-secondary.btn-sm.mr-3.pl-2(type="button" @click="confirmationDeletion(playlistItem.id)")
+            button.btn.btn-outline.btn-secondary.btn-sm.pl-2.block(type="button" @click="confirmationDeletion(playlistItem.id)")
               v-icon.mr-1(name="io-close" scale="1")
               span DELETE
+
+blocker-cmp(v-if="blocker")
 </template>

@@ -13,6 +13,7 @@ const playlists = ref([]);
 const search = ref('')
 const tokenStore = useTokenStore()
 const playlistsStore = usePlaylistsStore()
+const blocker = ref(false);
 
 const playlistsComputed = computed(() => {
   const filteredPlaylists = playlists.value.filter(item => {
@@ -33,6 +34,7 @@ tokenStore.$subscribe((mutation, state) => {
 
 function fetchPlaylistsPage(authToken, nextPageToken=null) {
   const url = constructFetchPlaylistUrl(nextPageToken)
+  blocker.value = true
 
   fetch(url, {
     headers: headers(authToken),
@@ -53,7 +55,9 @@ function fetchPlaylistsPage(authToken, nextPageToken=null) {
       } else {
         savePlaylistInStore(data)
       }
-    });
+    }).finally(() => {
+      blocker.value = false
+    })
 }
 
 function savePlaylistInStore(data) {
@@ -101,14 +105,16 @@ initialFetch()
 </script>
 
 <template lang="pug">
-.playlists.flex.flex-wrap.ml-60.mr-60(v-if="playlists.length")
-  input.input.input-bordered.w-96.ml-auto.mr-auto.mt-10.mb-10.text-center(type='text' placeholder='Search playlist  ' v-model="search")
+.playlists.flex.flex-wrap(v-if="playlists.length")
+  input.search.input.input-bordered.mt-10.mb-10.text-center(type='text' placeholder='Search playlist  ' v-model="search")
 
   .flex.flex-wrap.w-full
-    .card.playlist-card.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer(v-for="playlist in playlistsComputed" @click="goToPlaylist(playlist.id)")
+    .card.playlist-card.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer.bg-black(v-for="playlist in playlistsComputed" @click="goToPlaylist(playlist.id)")
       figure
         img(:src='playlist.thumbnail' alt='Playlist thumbnail')
       .card-body.h-64
         h2.card-title {{playlist.title}}
         .playlist-items.mask.mask-squircle.font-semibold.text-secondary-content.bg-primary.text-xs.m-4.p-3 {{playlist.itemCount}}
+
+blocker-cmp(v-if="blocker")
 </template>
