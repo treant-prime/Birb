@@ -4,8 +4,9 @@ import router from '@/router'
 import { usePlaylistsStore } from '@/stores/playlists'
 import { useTokenStore } from '@/stores/token'
 import { computed, ref } from 'vue'
+import ReplaceVideoModal from '@/components/ReplaceVideoModal.vue'
+import { PlaylistItem } from '@/classes/PlaylistItem.js'
 
-const ITEMS_PER_APGE = 50
 const playlistItems = ref([])
 const tokenStore = useTokenStore()
 const playlistsStore = usePlaylistsStore()
@@ -31,65 +32,46 @@ const currentPlaylist = computed(() => {
   )
 })
 
-// PPPP
 function fetchPlaylistsPage(authToken, nextPageToken = null) {
-  const url = constructFetchPlaylistUrl(nextPageToken)
+  const url = Playlist.prototype.fetchURL(nextPageToken)
 
   fetch(url, {
     headers: headers(authToken),
   })
     .then((response) => response.json())
     .then((data) => {
-      let mappedItems = data.items.map((item) => ({
-        title: item.snippet.title,
-        thumbnail: item.snippet.thumbnails.medium.url,
-        itemCount: item.contentDetails.itemCount,
-        id: item.id,
-      }))
+      let mappedItems = data.items.map((item) => {
+        return new Playlist(item)
+      })
       playlists.value = [...playlists.value, ...mappedItems]
-      // playlists.value = playlists.value.sort(sortByTitle)
-
       if (data.nextPageToken) {
         fetchPlaylistsPage(authToken, data.nextPageToken)
       } else {
-        savePlaylistInStore(data)
+        savePlaylistInStore(playlists.value)
       }
     })
 }
 
-function savePlaylistInStore(data) {
-  playlistsStore.setPlaylists(playlists.value)
+function savePlaylistInStore(playlists) {
+  playlistsStore.setPlaylists(playlists)
 }
-
-function constructFetchPlaylistUrl(nextPageToken) {
-  // url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${ITEMS_PER_APGE}&pageToken=${nextPageToken}`;
-  // Important: Po autoryzacji API_KEY nie jest juz potrzebny
-  // const part = "id,snippet,status,contentDetails";
-  const part = 'id,snippet,contentDetails'
-  let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=50`
-  if (nextPageToken) url = url + `&pageToken=${nextPageToken}`
-  return url
-}
-// PPPP
 
 function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
-  const url = constructUrl(nextPageToken)
   blocker.value = true
+  const url = PlaylistItem.prototype.fetchURL(
+    nextPageToken,
+    router.currentRoute.value.params.id
+  )
 
   fetch(url, {
     headers: headers(authToken),
   })
     .then((response) => response.json())
     .then((data) => {
-      let mappedItems = data.items.map((item) => ({
-        id: item.id,
-        title: item.snippet.title,
-        description: item.snippet.description,
-        thumbnail: item.snippet.thumbnails?.default?.url,
-        position: item.snippet.position,
-        isNotAvailable: !item.snippet?.videoOwnerChannelId,
-        videoId: item.snippet.resourceId.videoId,
-      }))
+      let mappedItems = data.items.map((item) => {
+        return new PlaylistItem(item)
+      })
+
       playlistItems.value = [...playlistItems.value, ...mappedItems]
 
       if (data.nextPageToken)
@@ -100,14 +82,6 @@ function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
     })
 }
 
-function constructUrl(nextPageToken) {
-  const playlistId = router.currentRoute.value.params.id
-  const part = 'snippet,id,contentDetails,status'
-  let url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}&maxResults=${ITEMS_PER_APGE}`
-  if (nextPageToken) url = url + `&pageToken=${nextPageToken}`
-  return url
-}
-
 function confirmationDeletion(playlistItemId) {
   if (confirm('Delete?') == true) {
     deleteVideo(playlistItemId)
@@ -115,17 +89,14 @@ function confirmationDeletion(playlistItemId) {
 }
 
 function deleteVideo(playlistItemId) {
-  const url = deletetUrl(playlistItemId)
-  console.log('playlistItemId', playlistItemId)
+  const url = PlaylistItem.prototype.deletetURL(playlistItemId)
   blocker.value = true
 
   fetch(url, {
     headers: headers(tokenStore.token),
     method: 'DELETE',
   })
-    .then((response) => {
-      console.log('response', response)
-      console.log('deleteVideo success')
+    .then(() => {
       closeModal()
       refetch()
     })
@@ -135,10 +106,6 @@ function deleteVideo(playlistItemId) {
     .finally(() => {
       blocker.value = false
     })
-}
-
-function deletetUrl(playlistItemId) {
-  return `https://youtube.googleapis.com/youtube/v3/playlistItems?id=${playlistItemId}`
 }
 
 function initialFetch() {

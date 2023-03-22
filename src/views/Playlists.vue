@@ -1,20 +1,24 @@
 <script setup>
-// const API_KEY = "";
-// const YT_CHANNEL_ID = "UCuQZ-VMez8stUmNvNDfpV7A";
-// const TEST_API_PLAYLIST_ID = "UC_x5XG1OV2P6uZZ5FSM9Ttw";
-
 import { headers, sortByTitle } from '@/helpers'
 import router from '@/router'
 import { usePlaylistsStore } from '@/stores/playlists'
 import { useTokenStore } from '@/stores/token'
+import { Playlist } from '@/classes/Playlist.js'
 import { computed, ref } from 'vue'
 
-const ITEMS_PER_APGE = 50
 const playlists = ref([])
 const search = ref('')
 const tokenStore = useTokenStore()
 const playlistsStore = usePlaylistsStore()
 const blocker = ref(false)
+
+tokenStore.$subscribe((mutation, state) => {
+  if (!!state.token) {
+    fetchPlaylistsPage(state.token)
+  } else {
+    playlists.value = []
+  }
+})
 
 const playlistsComputed = computed(() => {
   const filteredPlaylists = playlists.value.filter((item) => {
@@ -23,38 +27,26 @@ const playlistsComputed = computed(() => {
   return filteredPlaylists
 })
 
-tokenStore.$subscribe((mutation, state) => {
-  console.log('state', state)
-  console.log('state.token', state?.token)
-  if (!!state.token) {
-    fetchPlaylistsPage(state.token)
-  } else {
-    playlists.value = []
-  }
-})
-
 function fetchPlaylistsPage(authToken, nextPageToken = null) {
-  const url = constructFetchPlaylistUrl(nextPageToken)
   blocker.value = true
+  const url = Playlist.prototype.fetchURL(nextPageToken)
 
   fetch(url, {
     headers: headers(authToken),
   })
     .then((response) => response.json())
     .then((data) => {
-      let mappedItems = data.items.map((item) => ({
-        title: item.snippet.title,
-        thumbnail: item.snippet.thumbnails.medium.url,
-        itemCount: item.contentDetails.itemCount,
-        id: item.id,
-      }))
+      let mappedItems = data.items.map((item) => {
+        return new Playlist(item)
+      })
+
       playlists.value = [...playlists.value, ...mappedItems]
       playlists.value = playlists.value.sort(sortByTitle)
 
       if (data.nextPageToken) {
         fetchPlaylistsPage(authToken, data.nextPageToken)
       } else {
-        savePlaylistInStore(data)
+        savePlaylistInStore(playlists.value)
       }
     })
     .finally(() => {
@@ -62,18 +54,8 @@ function fetchPlaylistsPage(authToken, nextPageToken = null) {
     })
 }
 
-function savePlaylistInStore(data) {
-  playlistsStore.setPlaylists(playlists.value)
-}
-
-function constructFetchPlaylistUrl(nextPageToken) {
-  // url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${ITEMS_PER_APGE}&pageToken=${nextPageToken}`;
-  // Important: Po autoryzacji API_KEY nie jest juz potrzebny
-  // const part = "id,snippet,status,contentDetails";
-  const part = 'id,snippet,contentDetails'
-  let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=${ITEMS_PER_APGE}`
-  if (nextPageToken) url = url + `&pageToken=${nextPageToken}`
-  return url
+function savePlaylistInStore(playlists) {
+  playlistsStore.setPlaylists(playlists)
 }
 
 function initialFetch() {
@@ -83,7 +65,7 @@ function initialFetch() {
 }
 
 function goToPlaylist(id) {
-  router.push({ name: 'Playlist', params: { id } })
+  router.push({ name: 'PlaylistItems', params: { id } })
 }
 
 initialFetch()
