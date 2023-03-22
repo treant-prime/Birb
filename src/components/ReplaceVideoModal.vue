@@ -1,14 +1,14 @@
 <script setup>
 import { useTokenStore } from '@/stores/token'
-import { ref } from "vue";
-import { headers } from "@/helpers"
+import { ref } from 'vue'
+import { headers } from '@/helpers'
 import router from '@/router'
 
-const tokenStore = useTokenStore();
-const newVideoId = ref('');
+const tokenStore = useTokenStore()
+const newVideoId = ref('')
 
 const props = defineProps({
-  playlistItemToReplace: Object
+  playlistItemToReplace: Object,
 })
 
 const emit = defineEmits(['deleteVideo', 'close'])
@@ -18,25 +18,25 @@ function replaceVideo(playlistItemToReplaceId, newVideoId, position) {
   const playlistId = router.currentRoute.value.params.id
 
   const body = {
-    "snippet": {
-      "playlistId": playlistId,
-      "resourceId": {
-        "kind": "youtube#video",
-        "videoId": videoId
+    snippet: {
+      playlistId: playlistId,
+      resourceId: {
+        kind: 'youtube#video',
+        videoId: videoId,
       },
-      "position": position
-    }
+      position: position,
+    },
   }
 
   const url = constructPostUrl(playlistId)
 
   fetch(url, {
     headers: headers(tokenStore.token),
-    method: "POST",
+    method: 'POST',
     body: JSON.stringify(body),
   })
     .then((data) => {
-      if(data.status == 200) {
+      if (data.status == 200) {
         emit('deleteVideo', playlistItemToReplaceId)
       }
     })
@@ -47,8 +47,8 @@ function replaceVideo(playlistItemToReplaceId, newVideoId, position) {
 }
 
 function constructPostUrl(playlistId) {
-  const part = "snippet";
-  return `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}`;
+  const part = 'snippet'
+  return `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}`
 }
 
 function close() {

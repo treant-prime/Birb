@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @layer components {
-
   .btn {
     @apply dark:bg-black;
   }
@@ -39,4 +38,3 @@
     @apply bg-base-100 shadow-xl dark:bg-black break-words;
   }
 }
-

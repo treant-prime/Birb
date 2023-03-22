@@ -1,28 +1,20 @@
 <script setup>
-import { useTokenStore } from '@/stores/token'
-import { usePlaylistsStore } from '@/stores/playlists'
-import { ref, computed } from "vue";
+import { headers } from '@/helpers'
 import router from '@/router'
-import { headers } from "@/helpers"
-import ReplaceVideoModal from '@/components/ReplaceVideoModal.vue'
+import { usePlaylistsStore } from '@/stores/playlists'
+import { useTokenStore } from '@/stores/token'
+import { computed, ref } from 'vue'
 
-const ITEMS_PER_APGE = 50;
-const playlistItems = ref([]);
-const tokenStore = useTokenStore();
-const playlistsStore = usePlaylistsStore();
-const playlistItemToReplace = ref(null);
-const blocker = ref(false);
-const playlists  = ref([]);
-
-// playlistsStore.$subscribe((mutation, state) => {
-//   console.log('state', state)
-//   console.log('state.token', state?.playlists)
-// })
-
-console.log('playlistsStore.playlists', playlistsStore.playlists)
+const ITEMS_PER_APGE = 50
+const playlistItems = ref([])
+const tokenStore = useTokenStore()
+const playlistsStore = usePlaylistsStore()
+const playlistItemToReplace = ref(null)
+const blocker = ref(false)
+const playlists = ref([])
 
 tokenStore.$subscribe((mutation, state) => {
-  if(!!state.token) {
+  if (!!state.token) {
     fetchPlaylistItemsPage(state.token)
   } else {
     playlistItems.value = []
@@ -34,11 +26,13 @@ if (!playlistsStore?.playlists) {
 }
 
 const currentPlaylist = computed(() => {
-  return playlistsStore.playlists?.find(item => item.id == router.currentRoute.value.params.id)
+  return playlistsStore.playlists?.find(
+    (item) => item.id == router.currentRoute.value.params.id
+  )
 })
 
 // PPPP
-function fetchPlaylistsPage(authToken, nextPageToken=null) {
+function fetchPlaylistsPage(authToken, nextPageToken = null) {
   const url = constructFetchPlaylistUrl(nextPageToken)
 
   fetch(url, {
@@ -50,17 +44,17 @@ function fetchPlaylistsPage(authToken, nextPageToken=null) {
         title: item.snippet.title,
         thumbnail: item.snippet.thumbnails.medium.url,
         itemCount: item.contentDetails.itemCount,
-        id: item.id
-      }));
-      playlists.value = [...playlists.value, ...mappedItems];
+        id: item.id,
+      }))
+      playlists.value = [...playlists.value, ...mappedItems]
       // playlists.value = playlists.value.sort(sortByTitle)
 
       if (data.nextPageToken) {
-        fetchPlaylistsPage(authToken, data.nextPageToken);
+        fetchPlaylistsPage(authToken, data.nextPageToken)
       } else {
         savePlaylistInStore(data)
       }
-    });
+    })
 }
 
 function savePlaylistInStore(data) {
@@ -71,14 +65,14 @@ function constructFetchPlaylistUrl(nextPageToken) {
   // url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&key=${API_KEY}&mine=true&maxResults=${ITEMS_PER_APGE}&pageToken=${nextPageToken}`;
   // Important: Po autoryzacji API_KEY nie jest juz potrzebny
   // const part = "id,snippet,status,contentDetails";
-  const part = "id,snippet,contentDetails";
-  let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=50`;
-  if(nextPageToken) url = url + `&pageToken=${nextPageToken}`;
+  const part = 'id,snippet,contentDetails'
+  let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=50`
+  if (nextPageToken) url = url + `&pageToken=${nextPageToken}`
   return url
 }
 // PPPP
 
-function fetchPlaylistItemsPage(authToken, nextPageToken=null) {
+function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
   const url = constructUrl(nextPageToken)
   blocker.value = true
 
@@ -94,28 +88,28 @@ function fetchPlaylistItemsPage(authToken, nextPageToken=null) {
         thumbnail: item.snippet.thumbnails?.default?.url,
         position: item.snippet.position,
         isNotAvailable: !item.snippet?.videoOwnerChannelId,
-        videoId: item.snippet.resourceId.videoId
-      }));
-      playlistItems.value = [...playlistItems.value, ...mappedItems];
+        videoId: item.snippet.resourceId.videoId,
+      }))
+      playlistItems.value = [...playlistItems.value, ...mappedItems]
 
       if (data.nextPageToken)
-        fetchPlaylistItemsPage(authToken, data.nextPageToken);
-
-    }).finally(() => {
+        fetchPlaylistItemsPage(authToken, data.nextPageToken)
+    })
+    .finally(() => {
       blocker.value = false
     })
 }
 
 function constructUrl(nextPageToken) {
   const playlistId = router.currentRoute.value.params.id
-  const part = "snippet,id,contentDetails,status";
-  let url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}&maxResults=${ITEMS_PER_APGE}`;
-  if(nextPageToken) url = url + `&pageToken=${nextPageToken}`;
+  const part = 'snippet,id,contentDetails,status'
+  let url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}&maxResults=${ITEMS_PER_APGE}`
+  if (nextPageToken) url = url + `&pageToken=${nextPageToken}`
   return url
 }
 
 function confirmationDeletion(playlistItemId) {
-  if (confirm("Delete?") == true) {
+  if (confirm('Delete?') == true) {
     deleteVideo(playlistItemId)
   }
 }
@@ -127,16 +121,16 @@ function deleteVideo(playlistItemId) {
 
   fetch(url, {
     headers: headers(tokenStore.token),
-    method: "DELETE",
+    method: 'DELETE',
   })
     .then((response) => {
-      console.log('response', response);
-      console.log('deleteVideo success');
+      console.log('response', response)
+      console.log('deleteVideo success')
       closeModal()
       refetch()
     })
     .catch((error) => {
-      console.log("deleteVideo fail", error);
+      console.log('deleteVideo fail', error)
     })
     .finally(() => {
       blocker.value = false
@@ -144,7 +138,7 @@ function deleteVideo(playlistItemId) {
 }
 
 function deletetUrl(playlistItemId) {
-  return`https://youtube.googleapis.com/youtube/v3/playlistItems?id=${playlistItemId}`;
+  return `https://youtube.googleapis.com/youtube/v3/playlistItems?id=${playlistItemId}`
 }
 
 function initialFetch() {

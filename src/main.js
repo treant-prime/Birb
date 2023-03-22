@@ -1,28 +1,45 @@
-import App from "./App.vue";
-import router from "./router";
-import { createApp } from "vue";
-import { createPinia } from "pinia";
+import App from './App.vue'
+import router from './router'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 
-import { firebaseApp, db } from "@/database/firebase.js";
-import { OhVueIcon, addIcons } from "oh-vue-icons";
-import { FaKiwiBird, LaUserCircleSolid, BiGoogle, GiTombstone, BiBandaid, IoClose, FaGoogle, AiArchive } from "oh-vue-icons/icons";
+import { firebaseApp, db } from '@/database/firebase.js'
+import { OhVueIcon, addIcons } from 'oh-vue-icons'
+import {
+  FaKiwiBird,
+  LaUserCircleSolid,
+  BiGoogle,
+  GiTombstone,
+  BiBandaid,
+  IoClose,
+  FaGoogle,
+  AiArchive,
+} from 'oh-vue-icons/icons'
 
-import "./assets/main.css";
+import './assets/main.css'
 
-import BlockerCmp from "./components/BlockerCmp.vue"
+import BlockerCmp from './components/BlockerCmp.vue'
 
-addIcons(FaKiwiBird, LaUserCircleSolid, BiGoogle, GiTombstone, BiBandaid, IoClose, FaGoogle, AiArchive);
+addIcons(
+  FaKiwiBird,
+  LaUserCircleSolid,
+  BiGoogle,
+  GiTombstone,
+  BiBandaid,
+  IoClose,
+  FaGoogle,
+  AiArchive
+)
 
-const app = createApp(App);
+const app = createApp(App)
 // app.config.globalProperties.$firebaseApp = firebaseApp;
 // app.config.globalProperties.$db = db;
 
-window.firebaseApp = firebaseApp;
-window.db = db;
+window.firebaseApp = firebaseApp
+window.db = db
 
-app.component("v-icon", OhVueIcon);
-app.component("blocker-cmp", BlockerCmp);
-app.use(createPinia());
-app.use(router);
-app.mount("#app");
-
+app.component('v-icon', OhVueIcon)
+app.component('blocker-cmp', BlockerCmp)
+app.use(createPinia())
+app.use(router)
+app.mount('#app')
