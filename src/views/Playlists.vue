@@ -6,6 +6,7 @@
 import { useTokenStore } from '@/stores/token'
 import { usePlaylistsStore } from '@/stores/playlists'
 import { ref, computed } from "vue";
+import { headers, sortByTitle } from "@/helpers"
 import router from "@/router";
 
 const ITEMS_PER_APGE = 50;
@@ -72,23 +73,6 @@ function constructFetchPlaylistUrl(nextPageToken) {
   let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=${ITEMS_PER_APGE}`;
   if(nextPageToken) url = url + `&pageToken=${nextPageToken}`;
   return url
-}
-
-function headers(token) {
-  const bearer = "Bearer " + token;
-  return {
-    Authorization: bearer,
-    Accept: "application/json",
-  };
-}
-
-function sortByTitle(a, b) {
-  if( a.title > b.title) {
-    return 1;
-  } else {
-    return -1;
-  }
-  return 0;
 }
 
 function initialFetch() {
