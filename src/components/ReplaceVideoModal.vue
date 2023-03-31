@@ -58,7 +58,7 @@ function close() {
 
 <template lang="pug">
 .fixed-overlay(@click="close()")
-  .card.m-auto
+  .card
     .card-body(@click="event => event.stopPropagation()")
       h2.text-center Patch this video
       .mb-2 Replacing video:

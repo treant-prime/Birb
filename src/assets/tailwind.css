@@ -3,38 +3,40 @@
 @tailwind utilities;
 
 @layer components {
+  /* Daisy UI override */
+
+  .card {
+    @apply w-96 bg-base-100 shadow-xl dark:bg-black mt-auto mb-auto ml-4 mr-4 sm:m-auto;
+  }
+
+  .card .card-title {
+    @apply leading-5;
+  }
+
   .btn {
     @apply dark:bg-black;
   }
 
+  /* Custom styles */
   .navigation {
-    @apply p-3 flex justify-between items-center;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    @apply p-3 flex justify-between items-center pl-4 pr-4 sm:pl-6 sm:pr-6;
   }
 
-  @media screen and (max-width: 900px) {
-    .navigation {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
+  /* Playlists index */
+  .playlists {
+    @apply flex flex-wrap m-0 sm:ml-60 sm:mr-60;
   }
 
-  .card {
-    @apply w-96 bg-base-100 shadow-xl dark:bg-black relative;
+  .playlists-search {
+    @apply input input-bordered mt-10 mb-10 text-center w-full ml-4 mr-4 sm:w-96 sm:ml-auto sm:mr-auto;
   }
 
-  .card-body .playlist-items {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+  /* Playlist Tile */
+  .playlist-tile {
+    @apply shadow-xl dark:bg-black break-words image-full cursor-pointer bg-black mb-3;
   }
 
-  .card .card-title {
-    line-height: 1.2;
-  }
-
-  .playlist-card {
-    @apply bg-base-100 shadow-xl dark:bg-black break-words;
+  .playlist-tile-items-count {
+    @apply mask mask-squircle font-semibold text-secondary-content bg-primary text-xs m-4 p-3 absolute bottom-0 right-0;
   }
 }

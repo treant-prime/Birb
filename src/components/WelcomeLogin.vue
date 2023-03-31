@@ -50,7 +50,7 @@ function signIn() {
 
 <template lang="pug">
 .fixed-overlay
-  .card.m-auto
+  .card
     .card-body
       b.block Welcome to Birb
       .mb-2 Sign in to archive your playlists in easy 600 steps.

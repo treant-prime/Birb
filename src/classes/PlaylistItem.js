@@ -9,7 +9,7 @@ const PlaylistItem = class {
     this.videoId = item.snippet.resourceId.videoId
   }
 
-  fetchURL(nextPageToken, playlistId) {
+  static fetchURL(nextPageToken, playlistId) {
     const itemPerPage = 50
     const part = 'snippet,id,contentDetails,status'
     let url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}&maxResults=${itemPerPage}`
@@ -17,7 +17,7 @@ const PlaylistItem = class {
     return url
   }
 
-  deletetURL(playlistItemId) {
+  static deletetURL(playlistItemId) {
     return `https://youtube.googleapis.com/youtube/v3/playlistItems?id=${playlistItemId}`
   }
 }

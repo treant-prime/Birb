@@ -1,10 +1,10 @@
 <script setup>
 import { headers, sortByTitle } from '@/helpers'
-import router from '@/router'
 import { usePlaylistsStore } from '@/stores/playlists'
 import { useTokenStore } from '@/stores/token'
 import { Playlist } from '@/classes/Playlist.js'
 import { computed, ref } from 'vue'
+import PlaylistTile from '@/components/PlaylistTile.vue'
 
 const playlists = ref([])
 const search = ref('')
@@ -29,7 +29,7 @@ const playlistsComputed = computed(() => {
 
 function fetchPlaylistsPage(authToken, nextPageToken = null) {
   blocker.value = true
-  const url = Playlist.prototype.fetchURL(nextPageToken)
+  const url = Playlist.fetchURL(nextPageToken)
 
   fetch(url, {
     headers: headers(authToken),
@@ -64,24 +64,16 @@ function initialFetch() {
   }
 }
 
-function goToPlaylist(id) {
-  router.push({ name: 'PlaylistItems', params: { id } })
-}
-
 initialFetch()
 </script>
 
 <template lang="pug">
-.playlists.flex.flex-wrap(v-if="playlists.length")
-  input.search.input.input-bordered.mt-10.mb-10.text-center(type='text' placeholder='Search playlist' v-model="search")
+.playlists(v-if="playlists.length")
+  input.playlists-search(type='text' placeholder='Search playlist' v-model="search")
 
   .flex.flex-wrap.w-full
-    .card.playlist-card.bg-base-100.shadow-xl.image-full.mb-3.cursor-pointer.bg-black(v-for="playlist in playlistsComputed" @click="goToPlaylist(playlist.id)")
-      figure
-        img(:src='playlist.thumbnail' alt='Playlist thumbnail')
-      .card-body.h-64
-        h2.card-title {{playlist.title}}
-        .playlist-items.mask.mask-squircle.font-semibold.text-secondary-content.bg-primary.text-xs.m-4.p-3 {{playlist.itemCount}}
+    template(v-for="playlist in playlistsComputed")
+      playlist-tile(:playlist="playlist")
 
 blocker-cmp(v-if="blocker")
 </template>

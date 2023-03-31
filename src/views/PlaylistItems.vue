@@ -33,7 +33,7 @@ const currentPlaylist = computed(() => {
 })
 
 function fetchPlaylistsPage(authToken, nextPageToken = null) {
-  const url = Playlist.prototype.fetchURL(nextPageToken)
+  const url = Playlist.fetchURL(nextPageToken)
 
   fetch(url, {
     headers: headers(authToken),
@@ -58,7 +58,7 @@ function savePlaylistInStore(playlists) {
 
 function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
   blocker.value = true
-  const url = PlaylistItem.prototype.fetchURL(
+  const url = PlaylistItem.fetchURL(
     nextPageToken,
     router.currentRoute.value.params.id
   )
@@ -89,7 +89,7 @@ function confirmationDeletion(playlistItemId) {
 }
 
 function deleteVideo(playlistItemId) {
-  const url = PlaylistItem.prototype.deletetURL(playlistItemId)
+  const url = PlaylistItem.deletetURL(playlistItemId)
   blocker.value = true
 
   fetch(url, {
@@ -135,6 +135,7 @@ initialFetch()
 .playlist-title.my-4.flex.justify-between.items-end.leading-normal(v-if="currentPlaylist")
   h2.font-bold.block.mb-0 {{ currentPlaylist.title }}
   h3.font-bold.block.text-secondary.mb-0.ml-3.text-right {{ currentPlaylist.itemCount }} ITEMS
+
 .overflow-x-auto.w-full
   replace-video-modal(:playlistItemToReplace="playlistItemToReplace" v-if="playlistItemToReplace" @close="closeModal" @deleteVideo="deleteVideo($event)")
 
@@ -158,8 +159,6 @@ initialFetch()
             div.w-full
               template(v-if="!playlistItem.isNotAvailable")
                 .font-bold.table-title {{ playlistItem.title }}
-                //- .text-sm.opacity-50(v-if="playlistItem.isNotAvailable")
-                //-   a(:href="`https://www.google.com/search?q=${playlistItem.videoId}`" target="_blank") Google for video ID
 
               .rounded-lg.ml-6(v-else style="margin-top: -6px;")
                 .font-semibold.text-xs.text-zinc-500.inline-block FIND VIDEO:
@@ -182,3 +181,61 @@ initialFetch()
 
 blocker-cmp(v-if="blocker")
 </template>
+
+<style>
+.playlist-title {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
+@media screen and (max-width: 900px) {
+  .playlist-title {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .playlist-title h2,
+  .playlist-title h3 {
+    font-size: 1rem;
+    font-size: 1rem;
+    line-height: 1;
+  }
+}
+
+/* https://daisyui.com/docs/colors/ */
+.table tr.bg-deleted td {
+  background: hsl(var(--b2));
+  border-color: hsl(var(--b3));
+}
+
+.table {
+  width: calc(100% - 3rem);
+  margin: auto;
+}
+
+@media screen and (max-width: 900px) {
+  .table {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+/* wierd tailwind/daisy behavior */
+.table th:first-child {
+  z-index: 0;
+}
+
+.table .table-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 60vw;
+}
+
+.table td,
+.table th {
+  position: sticky;
+  position: -webkit-sticky;
+  left: 0px;
+}
+</style>

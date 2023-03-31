@@ -6,7 +6,16 @@ const Playlist = class {
     this.id = item.id
   }
 
-  fetchURL(nextPageToken) {
+  // Playlist.prototype.fetchURL(nextPageToken)
+  // fetchURL(nextPageToken) {
+  //   const part = 'id,snippet,contentDetails'
+  //   const itemPerPage = 50
+  //   let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=${itemPerPage}`
+  //   if (nextPageToken) url = url + `&pageToken=${nextPageToken}`
+  //   return url
+  // }
+
+  static fetchURL(nextPageToken) {
     const part = 'id,snippet,contentDetails'
     const itemPerPage = 50
     let url = `https://youtube.googleapis.com/youtube/v3/playlists?part=${part}&mine=true&maxResults=${itemPerPage}`
