@@ -26,6 +26,16 @@ function goToPlaylist(id) {
   word-break: break-word;
   max-width: calc((100%) / 7 - 14px);
   width: calc((100%) / 7 - 14px);
+  scale: 1;
+  transition: all 0.2s ease-in-out;
+  opacity: 0.9;
+}
+
+.card.playlist-tile:hover {
+  transform: scale(1.2);
+  opacity: 1;
+  box-shadow: 0px 0px 0px 6px white;
+  z-index: 999;
 }
 
 @media (max-width: 1650px) {
