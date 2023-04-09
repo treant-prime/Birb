@@ -3,9 +3,15 @@ import { useTokenStore } from '@/stores/token'
 import { ref } from 'vue'
 import { headers } from '@/helpers'
 import router from '@/router'
+import getVideoId from 'get-video-id'
+import PlaylistItems from '../views/PlaylistItems.vue'
+import { PlaylistItem } from '@/classes/PlaylistItem.js'
+import { useToast } from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css'
 
+const $toast = useToast()
 const tokenStore = useTokenStore()
-const newVideoId = ref('')
+const videoUrl = ref('')
 
 const props = defineProps({
   playlistItemToReplace: Object,
@@ -13,42 +19,48 @@ const props = defineProps({
 
 const emit = defineEmits(['deleteVideo', 'close'])
 
-function replaceVideo(playlistItemToReplaceId, newVideoId, position) {
-  const videoId = newVideoId
+function replaceVideo(playlistItemToReplaceId, videoUrl, position) {
   const playlistId = router.currentRoute.value.params.id
+  const id = findVideoId(videoUrl)
 
   const body = {
     snippet: {
       playlistId: playlistId,
       resourceId: {
         kind: 'youtube#video',
-        videoId: videoId,
+        videoId: id,
       },
       position: position,
     },
   }
 
-  const url = constructPostUrl(playlistId)
+  const url = PlaylistItem.postUrl(playlistId)
 
   fetch(url, {
     headers: headers(tokenStore.token),
     method: 'POST',
     body: JSON.stringify(body),
   })
-    .then((data) => {
-      if (data.status == 200) {
+    .then((response) => {
+      if (response.ok) {
+        $toast.success('Video healed')
         emit('deleteVideo', playlistItemToReplaceId)
+      } else if (response.status == 404) {
+        throw new Error('Video not found')
+      } else {
+        throw new Error('Action failed')
       }
     })
-    .catch(() => {
-      // will fail only when no network
-      console.log('replaceVideo fail')
+    .catch((e) => {
+      $toast.error(e.message)
     })
 }
 
-function constructPostUrl(playlistId) {
-  const part = 'snippet'
-  return `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}`
+function findVideoId(videoUrl) {
+  const { id } = getVideoId(videoUrl)
+  if (id) return id
+  $toast.error('Invalid URL')
+  throw new Error('Invalid URL')
 }
 
 function close() {
@@ -58,15 +70,16 @@ function close() {
 
 <template lang="pug">
 .fixed-overlay(@click="close()")
-  .card
-    .card-body(@click="event => event.stopPropagation()")
-      h2.text-center Patch this video
-      .mb-2 Replacing video:
-        b.ml-1 {{ playlistItemToReplace.title }}
-      .input-group
-        input.input.input-bordered.input-sm.w-full(type='text' placeholder='New Video URL' v-model="newVideoId")
+  transition(name="pop" appear)
+    .card
+      .card-body(@click="event => event.stopPropagation()")
+        h2.text-center Patch this video
+        .mb-2 Replacing video:
+          b.ml-1 {{ playlistItemToReplace.title }}
+        form.input-group(@submit.prevent="() => replaceVideo(playlistItemToReplace.id, videoUrl, playlistItemToReplace.position)")
+          input.input.input-bordered.input-sm.w-full(type='text' placeholder='New Video URL' v-model="videoUrl")
 
-        button.btn.btn-secondary.btn-sm.mr-3.pl-2(type="button" @click="replaceVideo(playlistItemToReplace.id, newVideoId, playlistItemToReplace.position)")
-          v-icon.mr-1(name="bi-bandaid" scale="1")
-          div PATCH
+          button.btn.btn-secondary.btn-sm.mr-3.pl-2(type="button" @click="replaceVideo(playlistItemToReplace.id, videoUrl, playlistItemToReplace.position)")
+            v-icon.mr-1(name="bi-bandaid" scale="1")
+            div PATCH
 </template>

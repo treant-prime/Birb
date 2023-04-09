@@ -14,7 +14,6 @@ const usePlaylistsStore = defineStore('playlists', () => {
   const arePlaylists = computed(() => !!playlists.value)
 
   function setPlaylists(payload) {
-    console.log('payload', payload)
     window.localStorage.setItem('playlists', JSON.stringify(payload))
     playlists.value = payload
   }

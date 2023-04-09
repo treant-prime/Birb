@@ -1,11 +1,16 @@
 <script setup>
 import { useTokenStore } from '@/stores/token'
 import router from '@/router'
+import { useToast } from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css'
+
+const $toast = useToast()
 const tokenStore = useTokenStore()
 
 function singOff() {
   tokenStore.deleteToken()
   router.push({ name: 'Playlists' })
+  $toast.success('Logoff success')
 }
 </script>
 

@@ -1,18 +1,23 @@
 <script setup>
+import { Playlist } from '@/classes/Playlist.js'
+import { PlaylistItem } from '@/classes/PlaylistItem.js'
 import { headers } from '@/helpers'
 import router from '@/router'
 import { usePlaylistsStore } from '@/stores/playlists'
 import { useTokenStore } from '@/stores/token'
-import { computed, ref } from 'vue'
 import ReplaceVideoModal from '@/components/ReplaceVideoModal.vue'
-import { PlaylistItem } from '@/classes/PlaylistItem.js'
 
-const playlistItems = ref([])
-const tokenStore = useTokenStore()
-const playlistsStore = usePlaylistsStore()
-const playlistItemToReplace = ref(null)
+import { computed, ref } from 'vue'
+import { useToast } from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css'
+
+const $toast = useToast()
 const blocker = ref(false)
+const playlistItems = ref([])
+const playlistItemToReplace = ref(null)
 const playlists = ref([])
+const playlistsStore = usePlaylistsStore()
+const tokenStore = useTokenStore()
 
 tokenStore.$subscribe((mutation, state) => {
   if (!!state.token) {
@@ -23,7 +28,7 @@ tokenStore.$subscribe((mutation, state) => {
 })
 
 if (!playlistsStore?.playlists) {
-  fetchPlaylistsPage(tokenStore.token)
+  getPlaylistsForSore(tokenStore.token)
 }
 
 const currentPlaylist = computed(() => {
@@ -32,7 +37,7 @@ const currentPlaylist = computed(() => {
   )
 })
 
-function fetchPlaylistsPage(authToken, nextPageToken = null) {
+function getPlaylistsForSore(authToken, nextPageToken = null) {
   const url = Playlist.fetchURL(nextPageToken)
 
   fetch(url, {
@@ -66,7 +71,16 @@ function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
   fetch(url, {
     headers: headers(authToken),
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (response.ok) {
+        return response.json()
+      } else if (response.status == 401) {
+        signOff()
+        throw new Error('Unauthenticated, signing off')
+      } else {
+        throw new Error('Something went wrong')
+      }
+    })
     .then((data) => {
       let mappedItems = data.items.map((item) => {
         return new PlaylistItem(item)
@@ -77,6 +91,9 @@ function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
       if (data.nextPageToken)
         fetchPlaylistItemsPage(authToken, data.nextPageToken)
     })
+    .catch((e) => {
+      $toast.error(e.message)
+    })
     .finally(() => {
       blocker.value = false
     })
@@ -84,11 +101,11 @@ function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
 
 function confirmationDeletion(playlistItemId) {
   if (confirm('Delete?') == true) {
-    deleteVideo(playlistItemId)
+    deleteVideo(playlistItemId, () => $toast.success('Video deleted'))
   }
 }
 
-function deleteVideo(playlistItemId) {
+function deleteVideo(playlistItemId, callback = null) {
   const url = PlaylistItem.deletetURL(playlistItemId)
   blocker.value = true
 
@@ -97,11 +114,12 @@ function deleteVideo(playlistItemId) {
     method: 'DELETE',
   })
     .then(() => {
+      if (callback) callback()
       closeModal()
       refetch()
     })
-    .catch((error) => {
-      console.log('deleteVideo fail', error)
+    .catch(() => {
+      $toast.error('Video deletion fail')
     })
     .finally(() => {
       blocker.value = false
@@ -131,13 +149,13 @@ initialFetch()
 </script>
 
 <template lang="pug">
-
 .playlist-title.my-4.flex.justify-between.items-end.leading-normal(v-if="currentPlaylist")
   h2.font-bold.block.mb-0 {{ currentPlaylist.title }}
   h3.font-bold.block.text-secondary.mb-0.ml-3.text-right {{ currentPlaylist.itemCount }} ITEMS
 
 .overflow-x-auto.w-full
-  replace-video-modal(:playlistItemToReplace="playlistItemToReplace" v-if="playlistItemToReplace" @close="closeModal" @deleteVideo="deleteVideo($event)")
+  transition(name="fade")
+    replace-video-modal(:playlistItemToReplace="playlistItemToReplace" v-if="playlistItemToReplace" @close="closeModal" @deleteVideo="deleteVideo($event)")
 
   table.table
     thead

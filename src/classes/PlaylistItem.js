@@ -20,6 +20,11 @@ const PlaylistItem = class {
   static deletetURL(playlistItemId) {
     return `https://youtube.googleapis.com/youtube/v3/playlistItems?id=${playlistItemId}`
   }
+
+  static postUrl(playlistId) {
+    const part = 'snippet'
+    return `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistId}`
+  }
 }
 
 export { PlaylistItem }

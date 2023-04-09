@@ -8,7 +8,9 @@ const tokenStore = useTokenStore()
 </script>
 
 <template>
-  <WelcomeLogin v-if="!tokenStore.isToken" />
+  <transition name="fade" appear>
+    <WelcomeLogin v-if="!tokenStore.isToken" />
+  </transition>
   <NavigationBar />
   <RouterView />
 </template>

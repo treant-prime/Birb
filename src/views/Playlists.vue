@@ -1,11 +1,16 @@
 <script setup>
+import { Playlist } from '@/classes/Playlist.js'
 import { headers, sortByTitle } from '@/helpers'
+import router from '@/router'
 import { usePlaylistsStore } from '@/stores/playlists'
 import { useTokenStore } from '@/stores/token'
-import { Playlist } from '@/classes/Playlist.js'
-import { computed, ref } from 'vue'
 import PlaylistTile from '@/components/PlaylistTile.vue'
 
+import { computed, ref } from 'vue'
+import { useToast } from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css'
+
+const $toast = useToast()
 const playlists = ref([])
 const search = ref('')
 const tokenStore = useTokenStore()
@@ -34,7 +39,16 @@ function fetchPlaylistsPage(authToken, nextPageToken = null) {
   fetch(url, {
     headers: headers(authToken),
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (response.ok) {
+        return response.json()
+      } else if (response.status == 401) {
+        signOff()
+        throw new Error('Unauthenticated, signing off')
+      } else {
+        throw new Error('Something went wrong')
+      }
+    })
     .then((data) => {
       let mappedItems = data.items.map((item) => {
         return new Playlist(item)
@@ -49,9 +63,17 @@ function fetchPlaylistsPage(authToken, nextPageToken = null) {
         savePlaylistInStore(playlists.value)
       }
     })
+    .catch((e) => {
+      $toast.error(e.message)
+    })
     .finally(() => {
       blocker.value = false
     })
+}
+
+function signOff() {
+  tokenStore.deleteToken()
+  router.push({ name: 'Playlists' })
 }
 
 function savePlaylistInStore(playlists) {

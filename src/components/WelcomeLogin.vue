@@ -6,9 +6,11 @@ import {
   GoogleAuthProvider,
   browserLocalPersistence,
 } from 'firebase/auth'
-
 import { useTokenStore } from '@/stores/token'
+import { useToast } from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css'
 
+const $toast = useToast()
 const tokenStore = useTokenStore()
 
 function setToken(payload) {
@@ -29,7 +31,7 @@ function signIn() {
         return signInWithPopup(auth, provider)
       })
       .catch(() => {
-        console.log('SetPersistence failed')
+        $toast.error('SetPersistence failed')
       })
   }
 
@@ -41,18 +43,20 @@ function signIn() {
       console.log('user', user)
       console.log('token', token)
       setToken(token)
+      $toast.success('Login success')
     })
     .catch(() => {
-      console.log('Login failed')
+      $toast.error('Login failed')
     })
 }
 </script>
 
 <template lang="pug">
 .fixed-overlay
-  .card
-    .card-body
-      b.block Welcome to Birb
-      .mb-2 Sign in to archive your playlists in easy 600 steps.
-      button.btn.w-full(@click="signIn" type="button") Sign in with Google
+  transition(name="pop" appear)
+    .card
+      .card-body
+        b.block Welcome to Birb
+        .mb-2 Sign in to archive your playlists in easy 600 steps.
+        button.btn.w-full(@click="signIn" type="button") Sign in with Google
 </template>
