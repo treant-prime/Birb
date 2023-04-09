@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 
 import { firebaseApp, db } from '@/database/firebase.js'
 import { OhVueIcon, addIcons } from 'oh-vue-icons'
+
 import {
   FaKiwiBird,
   LaUserCircleSolid,
@@ -14,6 +15,7 @@ import {
   IoClose,
   FaGoogle,
   AiArchive,
+  BiCheckLg,
 } from 'oh-vue-icons/icons'
 
 import './assets/main.css'
@@ -28,7 +30,8 @@ addIcons(
   BiBandaid,
   IoClose,
   FaGoogle,
-  AiArchive
+  AiArchive,
+  BiCheckLg
 )
 
 const app = createApp(App)

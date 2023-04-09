@@ -85,7 +85,9 @@ function signOff() {
   .card-body.h-64.justify-between
     h2.card-title {{playlist.title}}
     //- .playlist-tile-items-count {{playlist.itemCount}}
-    .playlist-tile-items-count(v-if="killedItemsCount > 0" :class="{'gelatine': animate}") {{killedItemsCount}}
+    .playlist-tile-items-count.bg-secondary-focus(v-if="playlistItems.length && killedItemsCount > 0" :class="{'gelatine': animate}") {{killedItemsCount}}
+    .playlist-tile-items-count.bg-primary-focus.p-1(v-if="playlistItems.length && killedItemsCount == 0")
+      v-icon(name="bi-check-lg" scale="1")
     button.btn.btn-sm.btn-primary.flex.text-xs.leading-3.pt-2.pb-2(type="button" @click.stop="checkPlaylistForDeadItems") SCAN
 </template>
 
@@ -101,11 +103,20 @@ function signOff() {
   opacity: 0.9;
 }
 
+.card.playlist-tile button {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
 .card.playlist-tile:hover {
   transform: scale(1.2);
   opacity: 1;
   box-shadow: 0px 0px 0px 6px white;
   z-index: 999;
+}
+
+.card.playlist-tile:hover button {
+  opacity: 1;
 }
 
 @media (max-width: 1650px) {
@@ -134,6 +145,7 @@ function signOff() {
 .gelatine {
   animation: gelatine 0.5s infinite;
 }
+
 @keyframes gelatine {
   from,
   to {

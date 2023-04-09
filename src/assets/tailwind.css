@@ -37,6 +37,13 @@
   }
 
   .playlist-tile-items-count {
-    @apply mask mask-squircle font-semibold text-secondary-content bg-secondary-focus text-xs m-4 p-3 absolute bottom-0 right-0;
+    @apply mask mask-squircle font-semibold text-secondary-content text-xs m-4 p-3 absolute bottom-0 right-0 z-10;
+    line-height: 1;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
