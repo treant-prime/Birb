@@ -141,6 +141,11 @@ function refetch() {
   initialFetch()
 }
 
+function signOff() {
+  tokenStore.deleteToken()
+  router.push({ name: 'Playlists' })
+}
+
 function closeModal() {
   playlistItemToReplace.value = null
 }
