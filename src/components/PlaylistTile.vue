@@ -88,7 +88,9 @@ function signOff() {
     .playlist-tile-items-count.bg-secondary-focus(v-if="playlistItems.length && killedItemsCount > 0" :class="{'gelatine': animate}") {{killedItemsCount}}
     .playlist-tile-items-count.bg-primary-focus.p-1(v-if="playlistItems.length && killedItemsCount == 0")
       v-icon(name="bi-check-lg" scale="1")
-    button.btn.btn-sm.btn-primary.flex.text-xs.leading-3.pt-2.pb-2(type="button" @click.stop="checkPlaylistForDeadItems") SCAN
+    button.btn.btn-sm.btn-accent.flex.text-xs.leading-3.gap-2.align-center.pl-2.justify-start(type="button" @click.stop="checkPlaylistForDeadItems")
+      v-icon(name="ri-scan-2-line" scale="1")
+      span.pl-2 SCAN
 </template>
 
 <styles lang="css">

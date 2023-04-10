@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --color-accent: #e8c688;
+    --color-accent-focus: #e3bb72;
+  }
+}
+
 @layer components {
   /* Daisy UI override */
 
@@ -15,6 +22,16 @@
 
   .btn {
     @apply dark:bg-black;
+  }
+
+  .btn-accent {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .btn-accent:hover {
+    background-color: var(--color-accent-focus);
+    border-color: var(--color-accent-focus);
   }
 
   /* Custom styles */

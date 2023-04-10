@@ -16,6 +16,7 @@ import {
   FaGoogle,
   AiArchive,
   BiCheckLg,
+  RiScan2Line,
 } from 'oh-vue-icons/icons'
 
 import './assets/main.css'
@@ -31,7 +32,8 @@ addIcons(
   IoClose,
   FaGoogle,
   AiArchive,
-  BiCheckLg
+  BiCheckLg,
+  RiScan2Line
 )
 
 const app = createApp(App)
