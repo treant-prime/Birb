@@ -1,30 +1,12 @@
 <script setup>
-import { ref, watch, computed } from 'vue'
-import { useRoute } from 'vue-router'
-
-import router from '@/router'
 import { useTokenStore } from '@/stores/token'
 import GoogleSignInButton from './GoogleSignInButton.vue'
 
 const tokenStore = useTokenStore()
-const route = useRoute()
-
-const routePath = computed(() => route?.path)
-const isPlaylistRoute = ref(false)
 
 function singOff() {
   tokenStore.deleteToken()
 }
-
-function goToPlaylist() {
-  if(tokenStore.isToken) {
-    router.push({ name: 'Playlists' })
-  } else {
-    alert('NO GO')
-  }
-}
-
-watch(routePath, val => isPlaylistRoute.value = val == '/playlists')
 </script>
 
 <template lang="pug">
@@ -37,7 +19,7 @@ watch(routePath, val => isPlaylistRoute.value = val == '/playlists')
     router-link.btn.btn-outline.btn-sm(to="/" active-class="text-white bg-neutral")
       span Home
 
-    button.btn.btn-outline.btn-sm.mr-10(@click="goToPlaylist" :class="{'text-white bg-neutral': isPlaylistRoute}")
+    router-link.btn.btn-outline.btn-sm.mr-10(to="/playlists" active-class="text-white bg-neutral")
       span Playlists
 
     .w-24.flex.justify-end
