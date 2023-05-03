@@ -1,13 +1,13 @@
 <script setup>
-import { useTokenStore } from '@/stores/token'
 import { ref } from 'vue'
-import { headers } from '@/helpers'
-import router from '@/router'
 import getVideoId from 'get-video-id'
-import PlaylistItems from '../views/PlaylistItems.vue'
-import { PlaylistItem } from '@/classes/PlaylistItem.js'
 import { useToast } from 'vue-toast-notification'
-import 'vue-toast-notification/dist/theme-sugar.css'
+
+import router from '@/router'
+import { useTokenStore } from '@/stores/token'
+import { headers } from '@/helpers'
+import { PlaylistItem } from '@/classes/PlaylistItem.js'
+import PlaylistItems from '../views/PlaylistItems.vue'
 
 const $toast = useToast()
 const tokenStore = useTokenStore()

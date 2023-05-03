@@ -42,7 +42,6 @@ function signIn() {
       console.log('user', user)
       console.log('token', token)
       setToken(token)
-      $toast.success('Login success')
     })
     .catch(() => {
       $toast.error('Login failed')
@@ -51,11 +50,7 @@ function signIn() {
 </script>
 
 <template lang="pug">
-.fixed-overlay
-  transition(name="pop" appear)
-    .card
-      .card-body
-        b.block Welcome to Birb
-        .mb-2 Sign in to archive your playlists in easy 600 steps.
-        button.btn.w-full(@click="signIn" type="button") Sign in with Google
+button.btn.btn-sm.btn-primary.gap-2.pl-2(type="button" @click="signIn")
+  v-icon(name="la-user-circle-solid" scale="1")
+  span SIGN IN
 </template>

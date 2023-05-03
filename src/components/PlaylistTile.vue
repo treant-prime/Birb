@@ -1,12 +1,12 @@
 <script setup>
-import { PlaylistItem } from '@/classes/PlaylistItem.js'
-import { headers } from '@/helpers'
-import router from '@/router'
 import { ref } from 'vue'
 import { useToast } from 'vue-toast-notification'
+
+import router from '@/router'
+import { PlaylistItem } from '@/classes/PlaylistItem.js'
+import { headers } from '@/helpers'
 import { useTokenStore } from '@/stores/token'
 import { useDeadItemsCounterStore } from '@/stores/deadItemsCounter'
-import 'vue-toast-notification/dist/theme-sugar.css'
 
 const props = defineProps({
   playlist: Object,

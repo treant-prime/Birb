@@ -1,15 +1,14 @@
 <script setup>
+import { computed, ref } from 'vue'
+import { useToast } from 'vue-toast-notification'
+
+import router from '@/router'
 import { Playlist } from '@/classes/Playlist.js'
 import { PlaylistItem } from '@/classes/PlaylistItem.js'
 import { headers } from '@/helpers'
-import router from '@/router'
 import { usePlaylistsStore } from '@/stores/playlists'
 import { useTokenStore } from '@/stores/token'
 import ReplaceVideoModal from '@/components/ReplaceVideoModal.vue'
-
-import { computed, ref } from 'vue'
-import { useToast } from 'vue-toast-notification'
-import 'vue-toast-notification/dist/theme-sugar.css'
 
 const $toast = useToast()
 const blocker = ref(false)
