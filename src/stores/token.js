@@ -1,10 +1,9 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useToast } from 'vue-toast-notification'
-import { useRouter } from '@/router'
+import router from '@/router'
 
 const toast = useToast()
-const router = useRouter()
 
 const useTokenStore = defineStore('token', () => {
   const tokenFetchedFormLocalStorage = window.localStorage.getItem('token')

@@ -1,12 +1,11 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useToast } from 'vue-toast-notification'
 
 import { useRoute } from '@/router'
-import { Playlist } from '@/classes/Playlist.js'
 import { PlaylistItem } from '@/classes/PlaylistItem.js'
 import { headers } from '@/helpers'
-import { usePlaylistsStore, functA } from '@/stores/playlists'
+import { usePlaylistsStore } from '@/stores/playlists'
 import { useTokenStore } from '@/stores/token'
 import ReplaceVideoModal from '@/components/ReplaceVideoModal.vue'
 
@@ -14,57 +13,19 @@ const $toast = useToast()
 const blocker = ref(false)
 const playlistItems = ref([])
 const playlistItemToReplace = ref(null)
-const playlists = ref([])
 const playlistsStore = usePlaylistsStore()
 const tokenStore = useTokenStore()
 const route = useRoute()
 
 tokenStore.$subscribe((mutation, state) => {
   if (!!state.token) {
-    fetchPlaylistItemsPage(state.token)
+    fetchPlaylistItems(state.token)
   } else {
     playlistItems.value = []
   }
 })
 
-if (!playlistsStore?.playlists) {
-  getPlaylistsForStore(tokenStore.token)
-}
-
-functA().functB()
-console.log(functA().gamma)
-
-const currentPlaylist = computed(() => {
-  return playlistsStore.playlists?.find(
-    (item) => item.id == route.params.id
-  )
-})
-
-function getPlaylistsForStore(authToken, nextPageToken = null) {
-  const url = Playlist.fetchURL(nextPageToken)
-
-  fetch(url, {
-    headers: headers(authToken),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      let mappedItems = data.items.map((item) => {
-        return new Playlist(item)
-      })
-      playlists.value = [...playlists.value, ...mappedItems]
-      if (data.nextPageToken) {
-        fetchPlaylistsPage(authToken, data.nextPageToken)
-      } else {
-        savePlaylistInStore(playlists.value)
-      }
-    })
-}
-
-function savePlaylistInStore(playlists) {
-  playlistsStore.setPlaylists(playlists)
-}
-
-function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
+function fetchPlaylistItems(authToken, nextPageToken = null) {
   blocker.value = true
   const url = PlaylistItem.fetchURL(
     nextPageToken,
@@ -92,7 +53,7 @@ function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
       playlistItems.value = [...playlistItems.value, ...mappedItems]
 
       if (data.nextPageToken)
-        fetchPlaylistItemsPage(authToken, data.nextPageToken)
+        fetchPlaylistItems(authToken, data.nextPageToken)
     })
     .catch((e) => {
       $toast.error(e.message)
@@ -129,32 +90,26 @@ function deleteVideo(playlistItemId, callback = null) {
     })
 }
 
-function initialFetch() {
-  if (tokenStore?.token) {
-    fetchPlaylistItemsPage(tokenStore.token)
-  }
-}
-
 function openReplaceVideoModal(playlistItem) {
   playlistItemToReplace.value = playlistItem
 }
 
 function refetch() {
   playlistItems.value = []
-  initialFetch()
+  fetchPlaylistItems()
 }
 
 function closeModal() {
   playlistItemToReplace.value = null
 }
 
-initialFetch()
+fetchPlaylistItems(tokenStore.token)
 </script>
 
 <template lang="pug">
-.playlist-title.my-4.flex.justify-between.items-end.leading-normal(v-if="currentPlaylist")
-  h2.font-bold.block.mb-0 {{ currentPlaylist.title }}
-  h3.font-bold.block.text-secondary.mb-0.ml-3.text-right {{ currentPlaylist.itemCount }} ITEMS
+.playlist-title.my-4.flex.justify-between.items-end.leading-normal(v-if="playlistsStore.currentPlaylist")
+  h2.font-bold.block.mb-0 {{ playlistsStore.currentPlaylist.title }}
+  h3.font-bold.block.text-secondary.mb-0.ml-3.text-right {{ playlistsStore.currentPlaylist.itemCount }} ITEMS
 
 .overflow-x-auto.w-full
   transition(name="fade")

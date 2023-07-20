@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory, useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
-import { useTokenStore } from '@/stores/token'
 
-// import Playlists from '@/views/Playlists.vue'
-// import PlaylistItems from '@/views/PlaylistItems.vue'
+import { useTokenStore } from '@/stores/token'
 import Home from '@/views/Home.vue'
 
 const toast = useToast()
@@ -23,8 +21,8 @@ const router = createRouter({
     },
     {
       path: '/playlists/:id',
-      name: 'PlaylistItems',
-      component: () => import('@/views/PlaylistItems.vue'),
+      name: 'Playlist',
+      component: () => import('@/views/Playlist.vue'),
     },
   ],
 })

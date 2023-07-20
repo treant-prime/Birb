@@ -29,8 +29,7 @@ if (counter != undefined) {
 }
 
 function goToPlaylist(id) {
-  console.log('id', id)
-  router.push({ name: 'PlaylistItems', params: { id } })
+  router.push({ name: 'Playlist', params: { id } })
 }
 
 function checkPlaylistForDeadItems() {

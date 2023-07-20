@@ -1,32 +1,55 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
+// import { computedAsync } from '@vueuse/core'
+// import { useAsyncState } from '@vueuse/core' does not work?
+
+import { useTokenStore } from '@/stores/token'
+import { Playlist } from '@/classes/Playlist.js'
+import { headers, sortByTitle } from '@/helpers'
+import router, { useRoute } from '@/router'
 
 const usePlaylistsStore = defineStore('playlists', () => {
-  const playlistsFetchedFormLocalStorage = JSON.parse(
-    window.localStorage.getItem('playlists') || null
-  )
-  const playlists = ref(null)
 
-  if (playlistsFetchedFormLocalStorage) {
-    playlists.value = playlistsFetchedFormLocalStorage
+  const playlists = ref([])
+  const tokenStore = useTokenStore()
+  const route = useRoute()
+
+  const currentPlaylist = computed(() => {
+    return playlists.value?.find(
+      (item) => item.id == router.currentRoute.value.params.id
+    )
+  })
+
+  async function fetchPlaylistsPage(authToken, nextPageToken = null) {
+    const url = Playlist.fetchURL(nextPageToken)
+
+    return await fetch(url, {
+      headers: headers(authToken),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        let mappedItems = data.items.map((item) => {
+          return new Playlist(item)
+        })
+
+        playlists.value = [...playlists.value, ...mappedItems]
+        playlists.value = playlists.value.sort(sortByTitle)
+
+        if (data.nextPageToken) {
+          fetchPlaylistsPage(authToken, data.nextPageToken)
+        }
+      })
   }
 
-  const arePlaylists = computed(() => !!playlists.value)
-
   function setPlaylists(payload) {
-    window.localStorage.setItem('playlists', JSON.stringify(payload))
     playlists.value = payload
   }
 
-  return { playlists, arePlaylists, setPlaylists }
+  if (!playlists.length && route.name == 'Playlist') {
+    fetchPlaylistsPage(tokenStore.token)
+  }
+
+  return { playlists, currentPlaylist, setPlaylists }
 })
 
-const functA = () => {
-	const gamma = 'gamma ';
-	const functB = () => {
-		console.log('functA')
-	}
-	return { gamma, functB }
-}
-
-export { usePlaylistsStore, functA }
+export { usePlaylistsStore }

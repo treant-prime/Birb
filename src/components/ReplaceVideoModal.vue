@@ -7,7 +7,7 @@ import { useRoute } from '@/router'
 import { useTokenStore } from '@/stores/token'
 import { headers } from '@/helpers'
 import { PlaylistItem } from '@/classes/PlaylistItem.js'
-import PlaylistItems from '../views/PlaylistItems.vue'
+import Playlist from '../views/Playlist.vue'
 
 const $toast = useToast()
 const tokenStore = useTokenStore()
