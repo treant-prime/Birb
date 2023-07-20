@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 import { useToast } from 'vue-toast-notification'
 
-import router from '@/router'
 import { Playlist } from '@/classes/Playlist.js'
 import { headers, sortByTitle } from '@/helpers'
 import { usePlaylistsStore } from '@/stores/playlists'
@@ -42,7 +41,7 @@ function fetchPlaylistsPage(authToken, nextPageToken = null) {
       if (response.ok) {
         return response.json()
       } else if (response.status == 401) {
-        signOff()
+        tokenStore.signOff()
         throw new Error('Unauthenticated, signing off')
       } else {
         throw new Error('Something went wrong')
@@ -68,11 +67,6 @@ function fetchPlaylistsPage(authToken, nextPageToken = null) {
     .finally(() => {
       blocker.value = false
     })
-}
-
-function signOff() {
-  tokenStore.deleteToken()
-  router.push({ name: 'Playlists' })
 }
 
 function savePlaylistInStore(playlists) {

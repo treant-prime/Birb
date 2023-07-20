@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
 import { useTokenStore } from '@/stores/token'
 
-import Playlists from '@/views/Playlists.vue'
-import PlaylistItems from '@/views/PlaylistItems.vue'
+// import Playlists from '@/views/Playlists.vue'
+// import PlaylistItems from '@/views/PlaylistItems.vue'
 import Home from '@/views/Home.vue'
 
 const toast = useToast()
@@ -19,12 +19,12 @@ const router = createRouter({
     {
       path: '/playlists',
       name: 'Playlists',
-      component: Playlists,
+      component: () => import('@/views/Playlists.vue'),
     },
     {
-      path: '/:id',
+      path: '/playlists/:id',
       name: 'PlaylistItems',
-      component: PlaylistItems,
+      component: () => import('@/views/PlaylistItems.vue'),
     },
   ],
 })
@@ -34,12 +34,15 @@ router.beforeEach((to) => {
   // https://pinia.vuejs.org/core-concepts/outside-component-usage.html
   const tokenStore = useTokenStore()
 
-  if(to.path == '/playlists' && !tokenStore.isToken) {
+  if(!tokenStore.isToken && to.name != 'Home') {
     toast.error('No go buddy')
-    return false
-  } else {
-    return true
+    return { name: 'Home' }
   }
 })
 
 export default router
+
+export {
+  useRoute,
+  useRouter
+}

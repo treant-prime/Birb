@@ -21,4 +21,12 @@ const usePlaylistsStore = defineStore('playlists', () => {
   return { playlists, arePlaylists, setPlaylists }
 })
 
-export { usePlaylistsStore }
+const functA = () => {
+	const gamma = 'gamma ';
+	const functB = () => {
+		console.log('functA')
+	}
+	return { gamma, functB }
+}
+
+export { usePlaylistsStore, functA }

@@ -3,10 +3,6 @@ import { useTokenStore } from '@/stores/token'
 import GoogleSignInButton from './GoogleSignInButton.vue'
 
 const tokenStore = useTokenStore()
-
-function singOff() {
-  tokenStore.deleteToken()
-}
 </script>
 
 <template lang="pug">
@@ -23,7 +19,7 @@ function singOff() {
       span Playlists
 
     .w-24.flex.justify-end
-      button.btn.btn-sm.btn-primary.gap-2.pl-2(v-if="tokenStore.isToken" @click="singOff" type="button")
+      button.btn.btn-sm.btn-primary.gap-2.pl-2(v-if="tokenStore.isToken" @click="tokenStore.signOff()" type="button")
         v-icon(name="la-user-circle-solid" scale="1")
         span SIGN OFF
 

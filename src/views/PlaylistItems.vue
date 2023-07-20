@@ -2,11 +2,11 @@
 import { computed, ref } from 'vue'
 import { useToast } from 'vue-toast-notification'
 
-import router from '@/router'
+import { useRoute } from '@/router'
 import { Playlist } from '@/classes/Playlist.js'
 import { PlaylistItem } from '@/classes/PlaylistItem.js'
 import { headers } from '@/helpers'
-import { usePlaylistsStore } from '@/stores/playlists'
+import { usePlaylistsStore, functA } from '@/stores/playlists'
 import { useTokenStore } from '@/stores/token'
 import ReplaceVideoModal from '@/components/ReplaceVideoModal.vue'
 
@@ -17,6 +17,7 @@ const playlistItemToReplace = ref(null)
 const playlists = ref([])
 const playlistsStore = usePlaylistsStore()
 const tokenStore = useTokenStore()
+const route = useRoute()
 
 tokenStore.$subscribe((mutation, state) => {
   if (!!state.token) {
@@ -27,16 +28,19 @@ tokenStore.$subscribe((mutation, state) => {
 })
 
 if (!playlistsStore?.playlists) {
-  getPlaylistsForSore(tokenStore.token)
+  getPlaylistsForStore(tokenStore.token)
 }
+
+functA().functB()
+console.log(functA().gamma)
 
 const currentPlaylist = computed(() => {
   return playlistsStore.playlists?.find(
-    (item) => item.id == router.currentRoute.value.params.id
+    (item) => item.id == route.params.id
   )
 })
 
-function getPlaylistsForSore(authToken, nextPageToken = null) {
+function getPlaylistsForStore(authToken, nextPageToken = null) {
   const url = Playlist.fetchURL(nextPageToken)
 
   fetch(url, {
@@ -64,7 +68,7 @@ function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
   blocker.value = true
   const url = PlaylistItem.fetchURL(
     nextPageToken,
-    router.currentRoute.value.params.id
+    route.params.id
   )
 
   fetch(url, {
@@ -74,7 +78,7 @@ function fetchPlaylistItemsPage(authToken, nextPageToken = null) {
       if (response.ok) {
         return response.json()
       } else if (response.status == 401) {
-        signOff()
+        tokenStore.signOff()
         throw new Error('Unauthenticated, signing off')
       } else {
         throw new Error('Something went wrong')
@@ -140,11 +144,6 @@ function refetch() {
   initialFetch()
 }
 
-function signOff() {
-  tokenStore.deleteToken()
-  router.push({ name: 'Playlists' })
-}
-
 function closeModal() {
   playlistItemToReplace.value = null
 }
@@ -159,7 +158,9 @@ initialFetch()
 
 .overflow-x-auto.w-full
   transition(name="fade")
-    replace-video-modal(:playlistItemToReplace="playlistItemToReplace" v-if="playlistItemToReplace" @close="closeModal" @deleteVideo="deleteVideo($event)")
+    replace-video-modal(
+      :playlistItemToReplace="playlistItemToReplace" v-if="playlistItemToReplace" @close="closeModal" @deleteVideo="deleteVideo($event)"
+    )
 
   table.table
     thead

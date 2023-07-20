@@ -1,10 +1,10 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useToast } from 'vue-toast-notification'
-
-import router from '@/router'
+import { useRouter } from '@/router'
 
 const toast = useToast()
+const router = useRouter()
 
 const useTokenStore = defineStore('token', () => {
   const tokenFetchedFormLocalStorage = window.localStorage.getItem('token')
@@ -21,14 +21,14 @@ const useTokenStore = defineStore('token', () => {
     toast.success('Login success')
   }
 
-  function deleteToken() {
+  function signOff() {
     window.localStorage.removeItem('token')
     token.value = null
     router.push({ name: 'Home' })
     toast.success('Logoff success')
   }
 
-  return { token, isToken, setToken, deleteToken }
+  return { token, isToken, setToken, signOff }
 })
 
 export { useTokenStore }

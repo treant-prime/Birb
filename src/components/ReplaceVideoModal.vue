@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import getVideoId from 'get-video-id'
 import { useToast } from 'vue-toast-notification'
 
-import router from '@/router'
+import { useRoute } from '@/router'
 import { useTokenStore } from '@/stores/token'
 import { headers } from '@/helpers'
 import { PlaylistItem } from '@/classes/PlaylistItem.js'
@@ -12,6 +12,7 @@ import PlaylistItems from '../views/PlaylistItems.vue'
 const $toast = useToast()
 const tokenStore = useTokenStore()
 const videoUrl = ref('')
+const route = useRoute()
 
 const props = defineProps({
   playlistItemToReplace: Object,
@@ -20,7 +21,7 @@ const props = defineProps({
 const emit = defineEmits(['deleteVideo', 'close'])
 
 function replaceVideo(playlistItemToReplaceId, videoUrl, position) {
-  const playlistId = router.currentRoute.value.params.id
+  const playlistId = route.params.id
   const id = findVideoId(videoUrl)
 
   const body = {

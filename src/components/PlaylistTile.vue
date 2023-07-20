@@ -2,12 +2,13 @@
 import { ref } from 'vue'
 import { useToast } from 'vue-toast-notification'
 
-import router from '@/router'
+import { useRouter } from '@/router'
 import { PlaylistItem } from '@/classes/PlaylistItem.js'
 import { headers } from '@/helpers'
 import { useTokenStore } from '@/stores/token'
 import { useDeadItemsCounterStore } from '@/stores/deadItemsCounter'
 
+const router = useRouter()
 const props = defineProps({
   playlist: Object,
 })
@@ -28,6 +29,7 @@ if (counter != undefined) {
 }
 
 function goToPlaylist(id) {
+  console.log('id', id)
   router.push({ name: 'PlaylistItems', params: { id } })
 }
 
@@ -50,7 +52,7 @@ function fetchItems(authToken, nextPageToken = null) {
       if (response.ok) {
         return response.json()
       } else if (response.status == 401) {
-        signOff()
+        tokenStore.signOff()
         throw new Error('Unauthenticated, signing off')
       } else {
         throw new Error('Something went wrong')
@@ -87,11 +89,6 @@ function endActions() {
     playlistId: props.playlist.id,
     counter: killedItemsCount.value,
   })
-}
-
-function signOff() {
-  tokenStore.deleteToken()
-  router.push({ name: 'Playlists' })
 }
 </script>
 
