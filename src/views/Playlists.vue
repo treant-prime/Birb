@@ -10,6 +10,7 @@ import PlaylistTile from '@/components/PlaylistTile.vue'
 
 const $toast = useToast()
 const playlists = ref([])
+const tempPlaylists = ref([])
 const search = ref('')
 const tokenStore = useTokenStore()
 const playlistsStore = usePlaylistsStore()
@@ -52,12 +53,12 @@ function fetchPlaylistsPage(authToken, nextPageToken = null) {
         return new Playlist(item)
       })
 
-      playlists.value = [...playlists.value, ...mappedItems]
-      playlists.value = playlists.value.sort(sortByTitle)
+      tempPlaylists.value = [...tempPlaylists.value, ...mappedItems]
 
       if (data.nextPageToken) {
         fetchPlaylistsPage(authToken, data.nextPageToken)
       } else {
+        playlists.value = tempPlaylists.value.sort(sortByTitle)
         savePlaylistInStore(playlists.value)
       }
     })

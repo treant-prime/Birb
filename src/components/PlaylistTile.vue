@@ -22,7 +22,7 @@ const animate = ref(true)
 
 const killedItemsCount = ref(null)
 const counter = deadItemsCounterStore.getCounter(props.playlist.id)
-// console.log('counter', counter)
+
 if (counter != undefined) {
   killedItemsCount.value = counter
   animate.value = false
